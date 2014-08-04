@@ -93,14 +93,9 @@ while True:
 					for each_hit in hn_decoded["hits"]:
 						#print "HN hit Encountered"
 						theDate = each_hit["created_at"][:10]
-						theSQLDate = theDate
-						json_entry[3].append(each_hit["created_at"][:10])
-						#print json_entry[3]
 						#step 5 - store data to MySQL DB
-						print "beginning step 5"
-						cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, event_time) VALUES (%s, %s, %s)""", (json_entry[0], json_entry[1], )) 
+						cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, event_time) VALUES (%s, %s, %s)""", (json_entry[0], json_entry[1], theDate)) 
 				
-
 			else:
 				print "below star threhold"
 		else:

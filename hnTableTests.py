@@ -26,8 +26,6 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
                       passwd="password", # your password
                       db="masterDB") # name of the data base
 
-# you must create a Cursor object. It will let
-#  you execute all the queries you need
 cur = db.cursor() 
 
 hn_search_url = 'https://hn.algolia.io/api/v1/search_by_date?query=\"https://github.com/' + 'mojombo/grit' + '\"&tags=story&page=' + str(hn_incrementor)
@@ -40,17 +38,11 @@ if len(hn_decoded["hits"]) == 0:
 for each_hit in hn_decoded["hits"]:
 	theDate = each_hit["created_at"][:10]
 	#YYYY:MM:DD
-	theSQLDate = theDate[:3] + '-' + theDate[5:6] + '-' + theDate [8-9]
-	print "beginning step 5"
-	cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, event_time) VALUES (%s, %s, %s)""", ('mojombo/grit', '200', theSQLDate)) 
+	cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, event_time) VALUES (%s, %s, %s)""", ('mojombo/grit', '200', theDate)) 
 	db.commit()
 
-
-# print all the first cell of all the rows
 for row in cur.fetchall() :
     print str(row[0]) + '\t\t\t\t' + str(row[1]) + '\t\t' + str(row[2])
 
 cur.close()
 db.close()
-
-cursor.execute ("""INSERT INTO event_table (repo_name, stars, event_time) VALUES (%s, %s, %s)""", (repo_name, str(num_stars), created_at)) 
