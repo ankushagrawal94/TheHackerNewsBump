@@ -27,27 +27,27 @@ class ConcatJSONDecoder(json.JSONDecoder):
 
 conn = MySQLdb.connect(host = "localhost", user = "root", passwd = "password")
 cursor = conn.cursor()
-cursor.execute ("DROP DATABASE IF EXISTS masterDB")
-cursor.execute ("CREATE DATABASE masterDB")
-cursor.execute ("USE masterDB")
-cursor.execute ("""
-	CREATE TABLE event_table
-	(
-		repo_name   VARCHAR(255),
-		stars       INT(6),
-		event_time  DATE
-		)
-""")
-#cursor.execute ("""INSERT INTO event_table (repo_name, username, stars, event_time)
-#	VALUES (%s, %s, %s)""", ('Dine/ankushagrawal94', '2', '2014-07-10'))
-
+#cursor.execute ("DROP DATABASE IF EXISTS masterDB")
+#cursor.execute ("CREATE DATABASE masterDB")
+#cursor.execute ("USE masterDB")
+#cursor.execute ("""
+#	CREATE TABLE event_table
+#	(
+#		repo_name   VARCHAR(255),
+#		stars       INT(6),
+#		event_time  DATE
+#		)
+#""")
+#conn.commit()
+#print "succesfully reset the DB"
 
 #startAt = 1008 #FEB 12 2011
-startAt = 10654 #MAR 10
-startAt = 20000 #MAR 10
-stopAt = 40000
+startAt = 10654 #MAR 10 2012. They didn't record the number of stars prior to this date
+#startAt = 20000
+stopAt = 100000
 counter = 0
 good = 0
+processedFiles = 0
 try:
 	for yy in range(11,15):
 	    for mm in range(1,13):
@@ -67,27 +67,29 @@ try:
 	                    strDD = "0" + strDD
 	                if len(strMM) == 1:
 	                    strMM = "0" + strMM
-	                print "20" + strYY + "-" + strMM + "-" + strDD + "-" + strHH
+	                    processedFiles += 1
+	                print "20" + strYY + "-" + strMM + "-" + strDD + "-" + strHH + "\t\t" + "count is: " + str(counter) + "\t\tsuccesful entries is: " + str(good) + "\tProcessed Files is: " + str(processedFiles)
 	                try:
 	                    f = json.load (open ("/Volumes/WD_1TB/GitHub Archive/20"+strYY+"-"+strMM+"-"+strDD+"-"+strHH+".json", 'r') , cls=ConcatJSONDecoder)
 	                    for each_event in f:
 	                        if(each_event["type"] == "WatchEvent"):
 	                            try:
-	                            	repo_name = each_event["repository"]["full_name"]
+	                            	try:
+	                            		repo_name = each_event["repository"]["full_name"]
+	                            	except Exception, e:
+	                            		repo_name = each_event["repository"]["owner"] + "/" + each_event["repository"]["name"]
 	                                num_stars = int(each_event["repository"]["watchers"])
 	                                created_at = '20'+strYY+'-'+strMM+'-'+strDD
-	                                print repo_name + str(num_stars) + created_at
-	                                cursor.execute ("""INSERT INTO event_table (repo_name, username, stars, event_time)
-										VALUES (%s, %s, %s)""", (repo_name, num_stars, created_at))
+	                                cursor.execute ("""INSERT INTO event_table (repo_name, stars, event_time)
+										VALUES (%s, %s, %s)""", (repo_name, str(num_stars), created_at))
 	                                conn.commit()
 	                                good = good + 1
-	                                print "inserted succesfully #: " + good
 	                            except Exception, e:
 	                                print e
-	                                print "error parsing JSON or error inserting to DB"
+	                                print "error parsing JSON or error inserting to DB for file: " + "20" + strYY + "-" + strMM + "-" + strDD + "-" + strHH
 	                except Exception, e:
 	                    print e
-	                    print "error reading file"
+	                    print "error reading file: " + "20" + strYY + "-" + strMM + "-" + strDD + "-" + strHH
 except Exception, e:
 	raise e
 except:
@@ -117,4 +119,4 @@ cur.execute("SELECT * FROM event_table")
 
 # print all the first cell of all the rows
 for row in cur.fetchall() :
-    print row[0]
+    print str(row[0]) + '\t\t\t\t' + str(row[1]) + '\t\t' + str(row[2])
