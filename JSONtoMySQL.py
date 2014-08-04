@@ -120,3 +120,6 @@ cur.execute("SELECT * FROM event_table")
 # print all the first cell of all the rows
 for row in cur.fetchall() :
     print str(row[0]) + '\t\t\t\t' + str(row[1]) + '\t\t' + str(row[2])
+
+cur.close()
+db.close()

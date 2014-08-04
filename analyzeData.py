@@ -31,6 +31,13 @@ startAt = 10654 #MAR 10 2012
 stopAt = 20000
 counter = 0
 
+#open mysql DB for use
+db = MySQLdb.connect(host="localhost",
+                     user="root",
+                      passwd="password",
+                      db="masterDB")
+cur = db.cursor()
+
 #step 1 - Get Links to All Repos
 while True:
 	#json_entry = [user/repo_name], [# of stars], [username], [dates of mention], {date: # of stars}
@@ -85,45 +92,14 @@ while True:
 						break
 					for each_hit in hn_decoded["hits"]:
 						#print "HN hit Encountered"
+						theDate = each_hit["created_at"][:10]
+						theSQLDate = theDate
 						json_entry[3].append(each_hit["created_at"][:10])
 						#print json_entry[3]
-				#step 5 - Get timeline of number of stars
-				print "beginning step 5"
-				for yy in range(11,15):
-				    for mm in range(1,13):
-				        for dd in range(1,32):
-				            for hh in range(0,24):
-				                counter = counter + 1
-				                if counter < startAt:
-				                    continue    
-				                if counter > stopAt:
-				                    continue
-				                #print counter
-				                strHH = str(hh)
-				                strDD = str(dd)
-				                strMM = str(mm)
-				                strYY = str(yy)
-				                if len(strDD) == 1:
-				                    strDD = "0" + strDD
-				                if len(strMM) == 1:
-				                    strMM = "0" + strMM
-				                #print strYY + "-" + strMM + "-" + strDD + "-" + strHH
-				                try:
-				                    f = json.load (open ("/Volumes/WD_1TB/GitHub Archive/20"+strYY+"-"+strMM+"-"+strDD+"-"+strHH+".json", 'r') , cls=ConcatJSONDecoder)
-				                    for each_event in f:
-				                        if(each_event["type"] == "WatchEvent"):
-				                            try:
-				                                num_stars = int(each_event["repository"]["watchers"])
-				                                created_at = each_event["created_at"]
-				                                json_entry[4][created_at] = num_stars
-				                            except Exception, e:
-				                                print e
-				                except Exception, e:
-				                    print e
-				print json_entry[4]
-				data = 
-				with open('/Volumes/WD_1TB/FinalOutput.json.txt', 'w') as outfile:
-  					json.dump(data, outfile)
+						#step 5 - store data to MySQL DB
+						print "beginning step 5"
+						cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, event_time) VALUES (%s, %s, %s)""", (json_entry[0], json_entry[1], )) 
+				
 
 			else:
 				print "below star threhold"
