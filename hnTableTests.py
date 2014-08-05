@@ -1,5 +1,9 @@
 import MySQLdb
 import time
+import requests
+import json
+from json import JSONDecoder
+import re
 
 conn = MySQLdb.connect(host = "localhost", user = "root", passwd = "password")
 cursor = conn.cursor()
@@ -28,14 +32,13 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 
 cur = db.cursor() 
 
-hn_search_url = 'https://hn.algolia.io/api/v1/search_by_date?query=\"https://github.com/' + 'mojombo/grit' + '\"&tags=story&page=' + str(hn_incrementor)
+hn_search_url = 'https://hn.algolia.io/api/v1/search_by_date?query=\"https://github.com/' + 'mojombo/grit' + '\"&tags=story&page=' + str(0)
+print hn_search_url
 hn_response = requests.get(hn_search_url)
 hn_decoded = json.loads(hn_response.text)
 
-if len(hn_decoded["hits"]) == 0:
-	break
-
 for each_hit in hn_decoded["hits"]:
+	print "hit"
 	theDate = each_hit["created_at"][:10]
 	#YYYY:MM:DD
 	cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, event_time) VALUES (%s, %s, %s)""", ('mojombo/grit', '200', theDate)) 
