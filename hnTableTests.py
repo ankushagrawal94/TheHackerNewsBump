@@ -16,6 +16,7 @@ cursor.execute ("""
 	(
 		repo_name   VARCHAR(255),
 		stars       INT(6),
+		hn_points	INT(6),
 		event_time  DATE
 		)
 """)
@@ -40,9 +41,11 @@ hn_decoded = json.loads(hn_response.text)
 for each_hit in hn_decoded["hits"]:
 	print "hit"
 	theDate = each_hit["created_at"][:10]
+	points = each_hit["points"]
+	print points
 	#YYYY:MM:DD
-	cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, event_time) VALUES (%s, %s, %s)""", ('mojombo/grit', '200', theDate)) 
-	db.commit()
+	#cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, hn_points, event_time) VALUES (%s, %s, %s, %s)""", ('mojombo/grit', '200', theDate)) 
+	#db.commit()
 
 for row in cur.fetchall() :
     print str(row[0]) + '\t\t\t\t' + str(row[1]) + '\t\t' + str(row[2])
