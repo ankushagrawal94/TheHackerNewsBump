@@ -11,18 +11,18 @@ cursor = conn.cursor()
 #cursor.execute ("DROP DATABASE IF EXISTS masterDB")
 #cursor.execute ("CREATE DATABASE masterDB")
 cursor.execute ("USE masterDB")
-#cursor.execute("DROP TABLE IF EXISTS hn_event_table")
-#cursor.execute ("""
-	#CREATE TABLE hn_event_table
-	#(
-	#	repo_name   VARCHAR(255),
-#		stars       INT(6),
-##		hn_points	INT(6),
-#		event_time  DATE
-#	)
-#""")
-#conn.commit()
-#print "succesfully created the DB"
+cursor.execute("DROP TABLE IF EXISTS hn_event_table")
+cursor.execute ("""
+	CREATE TABLE hn_event_table
+	(
+		repo_name   VARCHAR(255),
+		stars       INT(6),
+		hn_points	INT(6),
+		event_time  DATE
+	)
+""")
+conn.commit()
+print "succesfully created the DB"
 
 cursor.close()
 conn.close()
@@ -34,7 +34,7 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 
 cur = db.cursor() 
 
-cur.execute("SELECT * FROM max_stars WHERE stars > 1000")
+cur.execute("SELECT * FROM max_stars WHERE stars > 10")
 
 hn_incrementor = -1
 
@@ -42,8 +42,8 @@ prev_row = ''
 
 api_counter = 0
 row_counter = 0
-start = 3964
-stop = 7932
+start = 0000
+stop = 100000
 
 try:
 	for row in cur.fetchall():

@@ -30,7 +30,7 @@ try:
 	                      db="masterDB") # name of the data base
 
 	cur = db.cursor() 
-	cur.execute(""" INSERT INTO max_stars_two
+	cur.execute(""" INSERT INTO max_stars
     SELECT y.repo_name, y.stars, y.event_time
 	FROM event_table y 
 	INNER JOIN (SELECT repo_name, max(event_time) as recent
