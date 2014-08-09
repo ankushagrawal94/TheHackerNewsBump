@@ -40,7 +40,7 @@ db = MySQLdb.connect(host="localhost",
 cur = db.cursor()
 
 #step 1 - Get Links to All Repos
-cur.execute("SELECT * FROM max_stars")
+cur.execute("SELECT DISTINCT FROM max_stars")
 
 oldRow = ""
 # print all the first cell of all the rows

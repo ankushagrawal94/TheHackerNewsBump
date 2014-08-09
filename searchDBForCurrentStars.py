@@ -11,7 +11,8 @@ cursor.execute ("""
 	CREATE TABLE max_stars
 	(
 		repo_name   VARCHAR(255),
-		stars       INT(6)
+		stars       INT(6),
+		event_time	DATE
 	)
 """)
 conn.commit()
@@ -29,15 +30,16 @@ try:
 	                      db="masterDB") # name of the data base
 
 	cur = db.cursor() 
-	cur.execute("""INSERT INTO max_stars 
-	    SELECT y.repo_name, y.stars 
-		FROM event_table y 
-		INNER JOIN (SELECT repo_name, max(event_time) as recent, stars
-				FROM event_table x
-				GROUP BY repo_name) x
-		ON y.repo_name = x.repo_name
-		AND x.recent = y.event_time""")
+	cur.execute(""" INSERT INTO max_stars_two
+    SELECT y.repo_name, y.stars, y.event_time
+	FROM event_table y 
+	INNER JOIN (SELECT repo_name, max(event_time) as recent
+			FROM event_table x
+			GROUP BY repo_name) x
+	ON y.repo_name = x.repo_name
+	AND x.recent = y.event_time""")
 	db.commit()
+
 	stopTime = time.time()
 	elapsedTime = stopTime - startTime
 	print elapsedTime
