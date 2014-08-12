@@ -4,12 +4,13 @@ import re
 import datetime
 
 db = MySQLdb.connect(host="localhost", # your host, usually localhost
-                     user="root", # your username
-                      db="dumpDB") # name of the data base
+	                     user="root", # your username
+	                      passwd="password", # your password
+	                      db="githubDB") # name of the data base
 
 cur = db.cursor() 
 
-cur.execute("SELECT * FROM hn_event_table WHERE stars > 1000 AND hn_points > 10 LIMIT 4")
+cur.execute("SELECT * FROM hn_event_table_two WHERE stars > 1000")
 hn_event_list = cur.fetchall()
 
 global_percent_change = [0] * 14

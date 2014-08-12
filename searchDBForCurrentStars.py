@@ -3,12 +3,12 @@ import time
 
 conn = MySQLdb.connect(host = "localhost", user = "root", passwd = "password")
 cursor = conn.cursor()
-#cursor.execute ("DROP DATABASE IF EXISTS masterDB")
-#cursor.execute ("CREATE DATABASE masterDB")
-cursor.execute ("USE masterDB")
-cursor.execute("DROP TABLE IF EXISTS max_stars")
+#cursor.execute ("DROP DATABASE IF EXISTS githubDB")
+##cursor.execute ("CREATE DATABASE githubDB")
+cursor.execute ("USE githubDB")
+cursor.execute("DROP TABLE IF EXISTS max_stars_two")
 cursor.execute ("""
-	CREATE TABLE max_stars
+	CREATE TABLE max_stars_two
 	(
 		repo_name   VARCHAR(255),
 		stars       INT(6),
@@ -27,17 +27,18 @@ try:
 	db = MySQLdb.connect(host="localhost", # your host, usually localhost
 	                     user="root", # your username
 	                      passwd="password", # your password
-	                      db="masterDB") # name of the data base
+	                      db="githubDB") # name of the data base
 
 	cur = db.cursor() 
-	cur.execute(""" INSERT INTO max_stars
+	cur.execute(""" INSERT INTO max_stars_two
     SELECT y.repo_name, y.stars, y.event_time
 	FROM event_table y 
 	INNER JOIN (SELECT repo_name, max(event_time) as recent
 			FROM event_table x
 			GROUP BY repo_name) x
 	ON y.repo_name = x.repo_name
-	AND x.recent = y.event_time""")
+	AND x.recent = y.event_time
+	ORDER BY repo_name ASC""")
 	db.commit()
 
 	stopTime = time.time()
