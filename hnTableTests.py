@@ -11,18 +11,17 @@ cursor = conn.cursor()
 #cursor.execute ("DROP DATABASE IF EXISTS githubDB")
 #cursor.execute ("CREATE DATABASE githubDB")
 cursor.execute ("USE githubDB")
-cursor.execute("DROP TABLE IF EXISTS hn_event_table")
-cursor.execute ("""
-	CREATE TABLE hn_event_table
-	(
-		repo_name   VARCHAR(255),
-		stars       INT(6),
-		hn_points	INT(6),
-		event_time  DATE
-	)
-""")
-conn.commit()
-print "succesfully created the DB"
+#cursor.execute("DROP TABLE IF EXISTS hn_event_table_two")
+#cursor.execute ("""
+#	CREATE TABLE hn_event_table_two
+#	(
+#		repo_name   VARCHAR(255),
+#		stars       INT(6),
+#		hn_points	INT(6),
+#		event_time  DATE
+#	)#
+#conn.commit()
+#print "succesfully created the DB"
 
 cursor.close()
 conn.close()
@@ -34,7 +33,7 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 
 cur = db.cursor() 
 
-cur.execute("SELECT * FROM max_stars_two WHERE stars > 10")
+cur.execute("SELECT * FROM max_stars WHERE stars > 10")
 
 hn_incrementor = -1
 
@@ -42,9 +41,10 @@ prev_row = ''
 
 api_counter = 0
 row_counter = 0
-start = 0000
-stop = 100000
-
+start = 160460
+stop = 1000000
+print time.time()
+print start
 try:
 	for row in cur.fetchall():
 		row_counter += 1
@@ -81,7 +81,7 @@ try:
 					theDate = each_hit["created_at"][:10]
 					thePoint = each_hit["points"]
 					#YYYY:MM:DD
-					cur.execute ("""INSERT INTO hn_event_table (repo_name, stars, hn_points, event_time) VALUES (%s, %s, %s, %s)""", (row[0], row[1], thePoint, theDate)) 
+					cur.execute ("""INSERT INTO hn_event_table_two (repo_name, stars, hn_points, event_time) VALUES (%s, %s, %s, %s)""", (row[0], row[1], thePoint, theDate)) 
 					db.commit()
 			except Exception, e:
 				print 'Exception hit!'
