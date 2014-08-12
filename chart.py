@@ -14,8 +14,8 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 cur = db.cursor() 
 
 event_num = 0
-start = 0
-stop = 10000
+start = 140
+stop = 155
 
 try:
 	
@@ -35,6 +35,9 @@ try:
 			cur.execute("SELECT * FROM hn_event_max WHERE stars > %s AND hn_points > %s" % (star_val, point_val))
 			hn_event_list = cur.fetchall()
 
+			if len(hn_event_list) == 0:
+				print "Skipping event# %s; No events with %s points and %s stars" % (event_num, star_val, point_val)
+				continue
 			global_percent_change = [0] * 14
 			global_percent_avg = [0] * 14
 			global_raw_stars = [0] * 15
@@ -66,7 +69,11 @@ try:
 				i = -7
 				prev_val = 0
 				prev_day_stars = 0
+				insuffecient_data = 0
 				while i < 8:
+					if insuffecient_data > 3:
+						i += 1
+						continue
 					prev_day = event_time + datetime.timedelta(days = i)
 					cur.execute(("SELECT stars FROM event_table WHERE event_time = \"%s\" AND repo_name = \"%s\"") % (prev_day, repo_name))
 					
@@ -75,14 +82,19 @@ try:
 					for row in cur.fetchall():
 						prev_day_stars = row[0]
 						flag = True
-					
+
+					if prev_day_stars == 0:
+						insuffecient_data += 1
+
 					if not flag:
 						raw_num_stars.append(float(prev_val))
 					else:
 						raw_num_stars.append(float(prev_day_stars))
 					prev_val = prev_day_stars	
-
 					i += 1
+				if insuffecient_data > 3:
+					print "insuffecient_data"
+					continue
 				print "total elapsed time is: %s seconds" % int(time.time() - start_time)
 				
 				print "Fixing Erroneous Data from: "
@@ -154,16 +166,23 @@ try:
 				print '\n\n--------------------------------------'
 
 			print "calculating global data..."
+			global_percent_change.insert(0,0)
+			global_raw_stars.insert(0,0)
+
 			global_percent_avg = (x/len(hn_event_list) for x in global_percent_change)
 			global_raw_star_avg = (x/len(hn_event_list) for x in global_raw_stars)
 
 			base = 1
 			total_sum = base
-			while total_sum < 15:
+			i = 0
+			while i < 14:
 				total_sum *= (1 + global_percent_change[i])
+				i += 1
 			mid = base
-			while mid < 8:
+			i = 0
+			while i < 8:
 				mid *= (1 + global_percent_change[i])
+				i += 1
 
 			global_delta_growth = ((total_sum - mid)/mid - (mid - base)/base)/((mid - base)/base)
 
@@ -177,13 +196,14 @@ try:
 			inner_cur = inner_db.cursor() 
 
 			global_percent_avg.insert(0,0)
-			global_delta_growth.insert(0,0)
+			global_raw_star_avg.insert(0,0)
 			for event in hn_event_list: #iterate through events
 				i = 0
 				repo_name = event[0]
 				stars = event[1]
 				hn_points = event[2]
 				while i < 15: #iterates through the days
+
 					inner_cur.execute("""INSERT INTO chart_table (day, slider_stars, slider_hn_points, daily_total_stars, daily_growth, change_in_growth) 
 								VALUES (%s, %s, %s, %s, %s, %s)""", (i, stars, hn_points, global_raw_star_avg[i], global_percent_avg[i], global_delta_growth))
 					i += 1
