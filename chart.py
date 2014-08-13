@@ -14,8 +14,8 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 cur = db.cursor() 
 
 event_num = 0
-start = 140
-stop = 155
+start = 0
+stop = 1
 
 try:
 	
@@ -28,15 +28,16 @@ try:
 				continue
 			if event_num > stop:
 				continue
-			print "You are on event #%s of %s" % (event_num, int(len(hn_point_params) * len(gh_point_params)))
+			print "You are on big_pic #%s of %s" % (event_num, int(len(hn_point_params) * len(gh_point_params)))
 			print "Beginning analysis for hn_points = %s & gh_stars = %s" % (point_val, star_val)
 			print "Total elapsed time is: %s seconds" % int(time.time() - start_time)
+			print "Performing Query ... "
 			
 			cur.execute("SELECT * FROM hn_event_max WHERE stars > %s AND hn_points > %s" % (star_val, point_val))
 			hn_event_list = cur.fetchall()
 
 			if len(hn_event_list) == 0:
-				print "Skipping event# %s; No events with %s points and %s stars" % (event_num, star_val, point_val)
+				print "Skipping event# %s; No big_pic with %s points and %s stars" % (event_num, star_val, point_val)
 				continue
 			global_percent_change = [0] * 14
 			global_percent_avg = [0] * 14
@@ -46,8 +47,6 @@ try:
 			prev_row = ''
 
 			for event in hn_event_list:
-				#12938 events before duplicates
-				#8237 after removing duplicates
 				event_count += 1
 
 				repo_name = event[0]
@@ -55,46 +54,47 @@ try:
 				hn_points = event[2]
 				event_time = event[3]
 
+				#skip duplicates
 				if event[0] == prev_row:
 					prev_row = event[0]
 					continue
 				else:
 					prev_row = event[0]
 
-				raw_num_stars = []
+				raw_num_stars = [0] * 15
 				repo_percent_change = []
 				print "Beginning analysis for: %s" % repo_name
 				print "total elapsed time is: %s seconds" % int(time.time() - start_time)
 				#Get all 15 days
-				i = -7
-				prev_val = 0
-				prev_day_stars = 0
-				insuffecient_data = 0
-				while i < 8:
-					if insuffecient_data > 3:
-						i += 1
-						continue
-					prev_day = event_time + datetime.timedelta(days = i)
-					cur.execute(("SELECT stars FROM event_table WHERE event_time = \"%s\" AND repo_name = \"%s\"") % (prev_day, repo_name))
-					
-					flag = False
+				
+				daily_event_times = [] 		#store event times for each day
+				daily_star_count = []		#store stars for each day
+				start_date = event_time + datetime.timedelta(days = -7)
+				end_date = event_time + datetime.timedelta(days = 7)
+				cur.execute(("SELECT * FROM event_table WHERE repo_name = \"%s\" AND event_time BETWEEN \"%s\" AND \"%s\" ") % (repo_name, start_date, end_date))
+				
+				flag = False		#tells whether you entered cur.fetchall for loop
+				for row in cur.fetchall():
+					#ET refers to event_table
+					ET_repo_name = row[0]
+					ET_stars = row[1]
+					ET_event_time = row[2]
+					cur.execute(("INSERT INTO event_table_condensed (repo_name, stars, event_time) VALUES (%s, %s, %s)"), (ET_repo_name, ET_stars, ET_event_time))
+					db.commit()
+					daily_event_times.append(ET_event_time)
+					daily_star_count.append(ET_stars)
+					flag = True
 
-					for row in cur.fetchall():
-						prev_day_stars = row[0]
-						flag = True
-
-					if prev_day_stars == 0:
-						insuffecient_data += 1
-
-					if not flag:
-						raw_num_stars.append(float(prev_val))
-					else:
-						raw_num_stars.append(float(prev_day_stars))
-					prev_val = prev_day_stars	
+				i = 0
+				while i < 15:
+					curr_day = start_date + datetime.timedelta(days = i)
+					try:
+						indexOfDay = daily_event_times.index(curr_day)
+						raw_num_stars[indexOfDay] = daily_star_count[indexOfDay]
+					except Exception, e:
+						pass
 					i += 1
-				if insuffecient_data > 3:
-					print "insuffecient_data"
-					continue
+
 				print "total elapsed time is: %s seconds" % int(time.time() - start_time)
 				
 				print "Fixing Erroneous Data from: "
@@ -106,7 +106,8 @@ try:
 					raw_star_count += raw_num_stars[i]
 					i += 1
 				if raw_star_count == 0:
-					print "print all zero data. Skipping"
+					print "All zero data. Skipping"
+					print '\n\n--------------------------------------'
 					continue
 
 				i = 0
@@ -121,7 +122,7 @@ try:
 					raw_num_stars[0] = first_non_zero
 
 				i = 1
-				while i < 15:
+				while i < len(raw_num_stars):
 					if raw_num_stars[i] == 0:
 						raw_num_stars[i] = raw_num_stars[i-1]
 					i += 1
@@ -156,22 +157,37 @@ try:
 					global_raw_stars[i] += raw_num_stars[i]
 					i += 1
 
+				print "the raw_num_stars is:"
+				print raw_num_stars
+
+				print "the global_raw_stars is:"
+				print global_raw_stars
+
 				print "repo name is: %s" % repo_name 
 				print "global raw stars is %s" % global_raw_stars
 				print "repo percent change is %s" % repo_percent_change
 				print "global percent change is %s" % global_percent_change
-				print "completed event #%s of %s" % (event_count, len(hn_event_list))
+				print "\ncompleted event #%s of %s" % (event_count, len(hn_event_list))
 				print "total elapsed time is: %s seconds" % int(time.time() - start_time)
 				print "average time per repo is: %s seconds" % int((time.time() - start_time)/event_count)
+				print "expected time remaining is: %s minutes" % ((int((time.time() - start_time)/event_count))*(len(hn_event_list) - event_count))
 				print '\n\n--------------------------------------'
 
 			print "calculating global data..."
 			global_percent_change.insert(0,0)
-			global_raw_stars.insert(0,0)
+			global_percent_avg.insert(0,0)
 
-			global_percent_avg = (x/len(hn_event_list) for x in global_percent_change)
-			global_raw_star_avg = (x/len(hn_event_list) for x in global_raw_stars)
-
+			i = 0
+			while i < len(global_percent_change):
+				global_percent_avg[i] = global_percent_change[i]/len(hn_event_list)
+				global_raw_star_avg[i] = global_raw_stars[i]/len(hn_event_list)
+				i += 1
+			i = 0
+			while i < len(global_raw_stars):
+				global_raw_star_avg[i] = global_raw_stars[i]/len(hn_event_list)
+				i += 1
+			print "successfully created global_percent_avg and global_raw_star_avg"
+			
 			base = 1
 			total_sum = base
 			i = 0
@@ -185,6 +201,7 @@ try:
 				i += 1
 
 			global_delta_growth = ((total_sum - mid)/mid - (mid - base)/base)/((mid - base)/base)
+			print "successfully created global_delta_growth to be: %s" % global_delta_growth
 
 			inner_db = MySQLdb.connect(host="localhost", # your host, usually localhost
 				                     user="root", # your username
@@ -192,11 +209,9 @@ try:
 				                      db="githubDB") # name of the data base
 
 			#write new data to database
-			print "Writing to chart_table"
+			print "Writing to chart_table_two ...\n"
 			inner_cur = inner_db.cursor() 
 
-			global_percent_avg.insert(0,0)
-			global_raw_star_avg.insert(0,0)
 			for event in hn_event_list: #iterate through events
 				i = 0
 				repo_name = event[0]
@@ -204,14 +219,14 @@ try:
 				hn_points = event[2]
 				while i < 15: #iterates through the days
 
-					inner_cur.execute("""INSERT INTO chart_table (day, slider_stars, slider_hn_points, daily_total_stars, daily_growth, change_in_growth) 
-								VALUES (%s, %s, %s, %s, %s, %s)""", (i, stars, hn_points, global_raw_star_avg[i], global_percent_avg[i], global_delta_growth))
+					inner_cur.execute("""INSERT INTO chart_table_two (day, slider_stars, slider_hn_points, daily_total_stars, daily_growth, change_in_growth) 
+								VALUES (%s, %s, %s, %s, %s, %s)""", (i, stars, hn_points, global_raw_star_avg[i], global_percent_avg[i]*100, global_delta_growth))
 					i += 1
 					inner_db.commit()
 
 			inner_cur.close()
 			inner_db.close()
-			print "data insertion complete"
+			print "data insertion complete\n"
 
 			print "global raw star average is: %s" % (global_raw_star_avg)
 			print "global percent average is: %s" % (global_percent_avg)
@@ -221,8 +236,6 @@ try:
 			print "average time per overall request is: %s seconds" % int((time.time() - start_time)/event_num)
 			print '\n\n\n--------------------------------------'
 
-			cur.close()
-			db.close()
 except Exception, e:
 	print e 
 	print 'Keyboard interupt received.'
@@ -231,3 +244,5 @@ finally:
 	print "stop: %s" % stop
 	print "event_num: %s" % event_num
 	print "total elapsed time: %s" % (time.time() - start_time)
+	cur.close()
+	db.close()
