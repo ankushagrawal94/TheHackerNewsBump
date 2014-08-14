@@ -1,3 +1,5 @@
+#searchDBForCurrentStars.py is reponsible for getting the most recent entry for each repository
+
 import MySQLdb
 import time
 

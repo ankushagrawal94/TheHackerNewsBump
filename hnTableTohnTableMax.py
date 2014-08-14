@@ -1,3 +1,5 @@
+#This file gets the most relevant HN event for each repo as determined by the number of upvotes recieved
+
 import MySQLdb
 import time
 

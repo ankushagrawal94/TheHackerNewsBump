@@ -1,3 +1,5 @@
+#This file is responsible for reading each of the JSON files and saving the relevant data into a mySQL database
+
 import MySQLdb
 import json
 from json import JSONDecoder

@@ -1,0 +1,24 @@
+<html>
+<head>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+google.load('visualization', '1', {packages: ['corechart']});
+google.setOnLoadCallback(drawVisualization);
+function drawVisualization() {
+var data = new google.visualization.DataTable();
+data.addColumn('string', 'x');
+data.addColumn({type: 'string', role: 'annotation'});
+data.addColumn({type: 'string', role: 'annotationText'});
+data.addColumn('number', '0');
+data.addRow(["-7", null, null, 0.0]);data.addRow(["-6", null, null, 0.19084]);data.addRow(["-5", null, null, 2.5]);data.addRow(["-4", null, null, 0.0]);data.addRow(["-3", null, null, 0.0]);data.addRow(["-2", null, null, 0.0]);data.addRow(["-1", null, null, 0.56818]);data.addRow(["0", 'HN', 'Hacker News Bump', 0.18519]);data.addRow(["1", null, null, 0.18382]);data.addRow(["2", null, null, 0.0]);data.addRow(["3", null, null, 0.0]);data.addRow(["4", null, null, 0.5]);data.addRow(["5", null, null, 0.0]);data.addRow(["6", null, null, 0.0]);data.addRow(["7", null, null, 13.63636]);
+
+new google.visualization.LineChart(document.getElementById('visualization')).draw(data,
+{width:1000,height:800,vAxis:
+{maxValue:10},annotations:
+{style:'line'}});}
+</script>
+</head>
+<body><div id="visualization">
+</div>
+</body>
+</html>
