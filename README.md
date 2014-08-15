@@ -13,7 +13,7 @@ Description: The task here was to obtain the entire history of GitHub events to 
 
 Challenge: Every data source GitHub provided had its own challenges. Originally I tried using the GitHub API's timeline of events. I eventually determined that it was not possible to get all the data I would have liked due to pagination limitations. My next attempt was to try and use Google BigQuery. This technology impressed me like no other, but unfortunately the analysis I wanted to complete could not be done for free. The next option for me was to use the GitHub Archive. The problem with this method was that I could not find a Python GZIP reader that could handle the files I downloaded. 
 
-Solution: I found a Ruby script that could handle downloading and reading the data. I used this to download XX,XXX files and extract the data into .json files. 
+Solution: I found a Ruby script that could handle downloading and reading the data. I used this to download XX,XXX files and extract the data into .json files. See downloadAllData.rb
 
 
 Challenge: Reading the newly created JSON data. The data downloaded and written was in a form I've seen referenced as a JSON stream. Standard Python libraries could not handle this.
@@ -42,3 +42,52 @@ Solution: Luckily I already had a query that looked similar - The one I used for
 
 
 Challenge: 
+
+
+
+
+
+
+
+Order of Files Used:
+
+downloadAllData.rb 			-	download all of the data into json files
+JSONtoMySQL.py 				- 	transfer relevant JSON data to a MySQL database
+searchDBForCurrentStars.py 	- 	is reponsible for getting the most recent entry for each repository
+getHNData.py 				-	query the algolia API to get the hn data into DB (55 hours to run)
+hnTabletoHNTableMax.py		- 	gets the most relevant HN event for each repo
+getRelevantGHevents.py 		- 	gets the most relevant GH events based on HN mentions
+analyzeData.py 				- 	Analyzes the data and saves results into DB
+graph.py 					-	This file prepares the HTML for graphing
+
+
+
+
+
+
+The HackerNews Bump
+Correlating GitHub Stars with Hacker News Upvotes
+3rd Annual GitHub Data Challenge
+
+With this data analysis we aim to answer the question: "How does posting a link to a repository on HackerNews change the number of stars a repository has?"
+Or more generally, "Is there such thing as the HN Bump?"
+
+
+The short answer to this question is that it will _____ the rate of growth in number of stars for the repo by ____%. The percentage increase varies depending on the number of stars your repository has and the number of upvotes your HackerNews post has.
+
+Insert main graph here
+
+
+Caption: This graph shows a series of things. First, it constrains the data to only match what is selected by the sliders. In red it shows the daily % increase in the number of stars for the week before and after a HN mention. In blue it shows the daily % increase in the number of stars for all repositories in the week surrounding the date we expect a mention to happen.
+
+That was a mighty caption so let us break down what it means and why we are using this data. First there are the two sliders you see up above. One controls the number of stars, and one controls the number of HN Points. These constrain the data represented in the graph to tiers. The reason for this is that there exists a big disparity in the effects on a repository with 50,000 stars as compared to one with less than 50 stars. The HN constraint is to help determine the number of HN Points you need your repository to get for it to get you the "bump". It is important to note that the GitHub repositories without mentions on hacker news (see blue) are not constrained by the HN_points slider.
+
+Now that we have covered the sliders, lets go over to the red data source. The blue line represents the percdenage increase in the number of stars each day. This is calculated by looking at the number of stars on each day for an individual repository, comparing it to the number of stars for the previous day, and calculating a percent increase. The data was calculated this way because we found the data to be too far skewed in the direction of large repositories when looking at raw increase in number of stars. If you want to see that chart, see below.
+
+The next data source we have is the all important baseline blue data. This contains has the information about all GitHub repositories within the constraints. It serves the purpose of showing us the daily rate of increase in stars we should expect a GitHub repository to have. This is useful in determining whether HN has any effect at all. The data included here is not the 14 day outlook for every span of days for every repository. It instead looks to our red data source to determine the number of days after a repository has been created for its HN feature [1]. We then use the 14 days surrounding the expected_hn_mention date to calculate our data. The reason we use this date is because to maintain the integrity of the estimate, the number of days after the repository's creation must be held constant.
+
+This is essentially how we got our data! For more in depth information about the techniques used in calculation, methods, challenges, code, steps for recreation and insights check out this blog post!
+
+The data was acquired from the GitHub Archive, the GitHub API, and the Algolia HN Api.
+
+Thanks for reading! We welcome any feedback you may have!
