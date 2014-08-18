@@ -83,16 +83,17 @@ try:
 					created_at = created_at[:10]
 					#print "created at is %s" % created_at
 				except:
-					print "No created at field"
+					#print "No created at field"
 					continue
 
 				try:
 					date_object = datetime.datetime.strptime(created_at, '%Y-%m-%d')
 					diff = hn_event_time - date_object.date()
 					num_diff = diff.microseconds + (diff.seconds + diff.days * 86400)
-					if diff.total_seconds() < 0:
+					if diff.total_seconds() < 1:
 						continue
 					num_days_after.append(diff.total_seconds()/3600/24)
+					print "elapsed time is: %s seconds" % (int(time.time() - start_time))
 					#print num_days_after
 				except Exception, e:
 					print e
