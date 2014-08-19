@@ -91,3 +91,14 @@ This is essentially how we got our data! For more in depth information about the
 The data was acquired from the GitHub Archive, the GitHub API, and the Algolia HN Api.
 
 Thanks for reading! We welcome any feedback you may have!
+
+
+
+
+
+---
+We determined the average number of days after a repository's creation to expect a HN mention. This value was calculated for each point and star threshold, but in the end the differences in the number of days seemed arbitrary and patternless. Therefore, we chose the average of these values to come up with: If a repository is mentioned on HN it is on average 352 after it's creation.
+This conclusion was used in the next step to analyze the data. We wanted to use data from events between 345 and 359 days after a repository was created. This was the closest approximation to a HN event and therefore closest to the range we used for the other calculation. In here lies a potential source of error for our baseline calculation. HN_events represent a popularity surge for repositories as seen in thr graphs. For the baseline, the arbitray 352 days after a repository's creation has no such growth and it is therefore difficult to obtain data for the expected growth at that time. Where as this may be an error in computing the conclusion to the question of how much it aids growth, it may answer the question of "does HN help a repository stay relevant a year after it's creation." The answer to that the data clearly shows to be yes. 
+
+---
+Instead of using a specific 352 days after a repository has been created, how about using a larger scope of data. Look for all events relating to a specific repo and look for the longest period of consecutive days of growth. If that value exceeds 5, use that growth. The problem with this is that it is only using days where we know there to be growth. Compare this to HN where we have no expectation of growth. It is a fortunate outcome for some, but not all, repositories. 

@@ -35,18 +35,16 @@ try:
 				continue
 			if event_num > stop:
 				continue
-			print "You are on big_pic #%s of %s" % (event_num, int(len(hn_point_params) * len(gh_point_params)))
-			print "Beginning analysis for hn_points = %s & gh_stars = %s" % (point_val, star_val)
-			print "Total elapsed time is: %s seconds" % int(time.time() - start_time)
-			print "Performing Query ... \n"
+			#print "You are on big_pic #%s of %s" % (event_num, int(len(hn_point_params) * len(gh_point_params)))
+			#print "Beginning analysis for hn_points = %s & gh_stars = %s" % (point_val, star_val)
+			#print "Total elapsed time is: %s seconds" % int(time.time() - start_time)
+			#print "Performing Query ... \n"
 			
 			try:
-				cur.execute("SELECT * FROM hn_event_max WHERE stars BETWEEN %s AND %s AND hn_points BETWEEN %s AND %s" % (star_val, gh_point_params[gh_point_counter], point_val, hn_point_params[hn_val_counter]))
+				cur.execute("SELECT * FROM event_table_general_condensed WHERE stars BETWEEN %s AND %s" % (star_val, gh_point_params[gh_point_counter]))
 			except:
-				try:
-					cur.execute("SELECT * FROM hn_event_max WHERE stars > %s AND hn_points BETWEEN %s AND %s" % (star_val, point_val, hn_point_params[hn_val_counter]))
-				except:
-					cur.execute("SELECT * FROM hn_event_max WHERE stars > %s AND hn_points > %s" % (star_val, point_val))
+				cur.execute("SELECT * FROM event_table_general_condensed WHERE stars > %s" % (star_val))
+				
 			hn_event_list = cur.fetchall()
 
 			if len(hn_event_list) == 0:
@@ -60,7 +58,7 @@ try:
 			prev_row = ''
 			hn_event_list_size = len(hn_event_list)
 			for event in hn_event_list:
-				event_count += 1
+				
 
 				repo_name = event[0]
 				stars = event[1]
@@ -172,6 +170,7 @@ try:
 					global_raw_stars[i] += raw_num_stars[i]
 					i += 1
 				completed_events += 1
+				event_count += 1
 				#print "the raw_num_stars is:"
 				#print raw_num_stars
 
@@ -182,10 +181,10 @@ try:
 				#print "global raw stars is %s" % global_raw_stars
 				#print "repo percent change is %s" % repo_percent_change
 				#print "global percent change is %s" % global_percent_change
-				print "\ncompleted event #%s of %s" % (event_count, hn_event_list_size)
-				print "total elapsed time is: %s seconds" % int(time.time() - start_time)
-				print "average time per repo is: %s seconds" % int((time.time() - start_time)/completed_events)
-				print '--------------------------------------'
+				#print "\ncompleted event #%s of %s" % (event_count, hn_event_list_size)
+				#print "total elapsed time is: %s seconds" % int(time.time() - start_time)
+				#print "average time per repo is: %s seconds" % int((time.time() - start_time)/completed_events)
+				#print '--------------------------------------'
 
 			i = 0
 			raw_star_count = 0
@@ -233,7 +232,7 @@ try:
 			print hn_event_list_size
 
 			try:
-				global_delta_growth = ((total_sum - mid)/mid - (mid - base)/base)/((mid - base)/base)
+				global_delta_growth = (float(float(total_sum) - mid)/mid - (float(mid) - base)/base)/float((mid - base)/base)
 				print "successfully created global_delta_growth to be: %s" % global_delta_growth
 			except:
 				infinite_growth += 1
@@ -246,13 +245,13 @@ try:
 				                      db="githubDB") # name of the data base
 
 			#write new data to database
-			print "Writing to chart_table ...\n"
+			print "Writing to chart_table_avg ...\n"
 			inner_cur = inner_db.cursor() 
 
 			i = 0
 			while i < 15: #iterates through the days
-				inner_cur.execute("""INSERT INTO chart_table (day, slider_stars, slider_hn_points, daily_total_stars, daily_growth, change_in_growth) 
-							VALUES (%s, %s, %s, %s, %s, %s)""", (i, star_val, point_val, global_raw_star_avg[i], global_percent_avg[i]*100, global_delta_growth))
+				inner_cur.execute("""INSERT INTO chart_table_avg (day, slider_stars, slider_hn_points, daily_avg_stars, daily_growth, change_in_growth, num_data_points) 
+							VALUES (%s, %s, %s, %s, %s, %s, %s)""", (i, star_val, point_val, global_raw_star_avg[i], global_percent_avg[i]*100, global_delta_growth, event_count))
 				i += 1
 				inner_db.commit()
 

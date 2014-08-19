@@ -15,16 +15,16 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 
 cur = db.cursor() 
 cur.execute ("USE githubDB")
-cur.execute("DROP TABLE IF EXISTS event_table_general_condensed")
-cur.execute ("""
-	CREATE TABLE event_table_general_condensed
-	(
-		repo_name   	VARCHAR(255),
-		stars       	INT(6),
-		event_time		DATE, 
-		repo_created	DATE
-	)
-""")
+#cur.execute("DROP TABLE IF EXISTS event_table_general_condensed")
+#cur.execute ("""
+#	CREATE TABLE event_table_general_condensed
+#	(
+#		repo_name   	VARCHAR(255),
+#		stars       	INT(6),
+#		event_time		DATE, 
+#		repo_created	DATE
+#	)
+#""")
 db.commit()
 print "succesfully created the DB"
 
@@ -61,6 +61,13 @@ for event in global_event_list:
 	event_time = event[2]
 	repo_created = event[3]
 
+	#random sample
+	if event_count > 820391:
+		continue
+	if event_count % 50 == 0:
+		continue
+	if event_count % 100 == 0:
+		continue
 	#skip duplicates
 	if event[0] == prev_row:
 		prev_row = event[0]
@@ -81,8 +88,9 @@ for event in global_event_list:
 		ET_event_time = row[2]
 		ET_repo_created = row[3]
 		if prev_entry == ET_event_time:
+			print "duplicate event_time"
 			continue
-		prev_entry = ET_repo_created
+		prev_entry = ET_event_time
 		cur.execute(("INSERT INTO event_table_general_condensed (repo_name, stars, event_time, repo_created) VALUES (%s, %s, %s, %s)"), (ET_repo_name, ET_stars, ET_event_time, ET_repo_created))
 		db.commit()
 
