@@ -52,54 +52,76 @@ global_event_list = cur.fetchall()
 
 prev_row = ''
 event_count = 0
+print "pausing now permitted by typing CTRL-C"
 #Iterate through this list and look for events in the 7 days before and after the expected_hn_mention_date. 
 #Put this in a table called event_table_general_condensed.
 for event in global_event_list:
-	event_count += 1
-	repo_name = event[0]
-	stars = event[1]
-	event_time = event[2]
-	repo_created = event[3]
-
-	#random sample
-	if event_count > 820391:
-		continue
-	if event_count % 50 == 0:
-		continue
-	if event_count % 100 == 0:
-		continue
-	#skip duplicates
-	if event[0] == prev_row:
-		prev_row = event[0]
-		continue
-	prev_row = event[0]
-	#352
-	expected_hn_mention_date = repo_created + datetime.timedelta(days = avg_days_after)
-	#Get all 15 days
-	start_date = expected_hn_mention_date + datetime.timedelta(days = -7)
-	end_date = expected_hn_mention_date + datetime.timedelta(days = 7)
-	cur.execute(("SELECT * FROM event_table_two WHERE repo_name = \"%s\" AND event_time BETWEEN \"%s\" AND \"%s\" ") % (repo_name, start_date, end_date))
-	
-	prev_entry = ''
-	for row in cur.fetchall():
-		#ET refers to event_table
-		ET_repo_name = row[0]
-		ET_stars = row[1]
-		ET_event_time = row[2]
-		ET_repo_created = row[3]
-		if prev_entry == ET_event_time:
-			print "duplicate event_time"
-			continue
-		prev_entry = ET_event_time
-		cur.execute(("INSERT INTO event_table_general_condensed (repo_name, stars, event_time, repo_created) VALUES (%s, %s, %s, %s)"), (ET_repo_name, ET_stars, ET_event_time, ET_repo_created))
-		db.commit()
-
-	print "completed event #%s of %s" % (event_count, len(global_event_list))
-	print "time elapsed is: %s seconds" % int(time.time() - start_time)
 	try:
-		print "Expected time until completion: %s seconds" %  (int((time.time() - start_time) / ( float(event_count)/len(global_event_list) )) - int(time.time() - start_time))
-	except Exception, e:
-		print e
+		event_count += 1
+		repo_name = event[0]
+		stars = event[1]
+		event_time = event[2]
+		repo_created = event[3]
+
+		#random sample
+		if event_count < 162697:
+			continue
+		if event_count % 50 == 0:
+			continue
+		if event_count % 100 == 0:
+			continue
+		#skip duplicates
+		if event[0] == prev_row:
+			prev_row = event[0]
+			continue
+		prev_row = event[0]
+		#352
+		expected_hn_mention_date = repo_created + datetime.timedelta(days = avg_days_after)
+		#Get all 15 days
+		start_date = expected_hn_mention_date + datetime.timedelta(days = -7)
+		end_date = expected_hn_mention_date + datetime.timedelta(days = 7)
+		cur.execute(("SELECT * FROM event_table_two WHERE repo_name = \"%s\" AND event_time BETWEEN \"%s\" AND \"%s\" ") % (repo_name, start_date, end_date))
+		
+		prev_entry = ''
+		for row in cur.fetchall():
+			#ET refers to event_table
+			ET_repo_name = row[0]
+			ET_stars = row[1]
+			ET_event_time = row[2]
+			ET_repo_created = row[3]
+			if prev_entry == ET_event_time:
+				print "duplicate event_time"
+				continue
+			prev_entry = ET_event_time
+			cur.execute(("INSERT INTO event_table_general_condensed (repo_name, stars, event_time, repo_created) VALUES (%s, %s, %s, %s)"), (ET_repo_name, ET_stars, ET_event_time, ET_repo_created))
+			db.commit()
+
+		print "completed event #%s of %s" % (event_count, len(global_event_list))
+		print "time elapsed is: %s seconds" % int(time.time() - start_time)
+		try:
+			print "Expected time until completion: %s seconds" %  (int((time.time() - start_time) / ( float(event_count)/len(global_event_list) )) - int(time.time() - start_time))
+		except Exception, e:
+			print e
+	except KeyboardInterrupt:
+	    print '\nPausing...  (Hit ENTER to continue, type quit to exit.)'
+	    try:
+	        response = raw_input()
+	        if response == 'quit':
+	            break
+	        print 'Resuming...'
+	        #cur.close()
+	        db.close()
+	        db = MySQLdb.connect(host="localhost", # your host, usually localhost
+	        					user="root", # your username
+	        					passwd="password", # your password
+	        					db="githubDB") # name of the data base
+	        cur = db.cursor() 
+	    except KeyboardInterrupt:
+	        print 'Quitting...'
+	        break
+	    finally:
+	    	cur.close()
+	    	db.close()
 
 print "\n\nEvent collection complete."
 
