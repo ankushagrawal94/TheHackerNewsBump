@@ -1,5 +1,6 @@
 #The HackerNews Bump
 ##Correlating GitHub Stars with Hacker News Upvotes##
+----------
 
 With this data analysis we aim to answer the question: *"How does posting a link to a repository on HackerNews change the number of stars a repository has?"*
 Or more generally, *"Is there such thing as the HN Bump?"*
@@ -24,26 +25,27 @@ The data was acquired from the GitHub Archive, the GitHub API, and the Algolia H
 
 Thanks for reading! We welcome any feedback you may have!
 
+----------
 
 Order of Files Used:
-
-`downloadAllData.rb 				-	download all of the data into json files
-JSONtoMySQL.py 					- 	transfer relevant JSON data to a MySQL database
-searchDBForCurrentStars.py 		- 	is reponsible for getting the most recent entry for each repository
-getHNData.py 					-	query the algolia API to get the hn data into DB (55 hours to run)
-hnTabletoHNTableMax.py			- 	gets the most relevant HN event for each repo
-getRelevantGHevents.py 			- 	gets the most relevant GH events based on HN mentions
-getExpectedDateOfMention.py 	- 	gets the hn_expected_date_of_mention
-getRelevantGHeventAvgCase.py 	-	get the most relevant GH events where relevance is defined as within 1 week of the hn_expected_date_of_mention
-analyzeData.py 					- 	Analyzes the data and saves results into DB
-analyzeDateAvgCase.py 			-	Analyzes the average cases data
-graph.py 						-	This file prepares the HTML for graphing`
-
+```
+ - downloadAllData.rb 				-	download all of the data into JSON files
+ - JSONtoMySQL.py 					- 	transfer relevant JSON data to a MySQL  - database
+ - searchDBForCurrentStars.py 		- 	is responsible for getting the most recent entry for each repository
+ - getHNData.py 					-	query the algolia API to get the hn data into DB (55 hours to run)
+ - hnTabletoHNTableMax.py			- 	gets the most relevant HN event for each repo
+ - getRelevantGHevents.py 			- 	gets the most relevant GH events based on HN mentions
+ - getExpectedDateOfMention.py 		- 	gets the hn_expected_date_of_mention
+ - getRelevantGHeventAvgCase.py 	-	get the GH events within 1 week of the hn_expected_date_of_mention
+ - analyzeData.py 					- 	Analyzes the data and saves results into DB
+ - analyzeDateAvgCase.py 			-	Analyzes the average cases data
+ - graph.py 						-	This file prepares the HTML for graphing
+```
 
 ##Tables Used
 
 chart_table_avg
-
+```
 +------------------+--------------+------+-----+---------+-------+
 | Field            | Type         | Null | Key | Default | Extra |
 +------------------+--------------+------+-----+---------+-------+
@@ -155,3 +157,4 @@ max_stars
 | stars      | int(6)       | YES  |     | NULL    |       |
 | event_time | date         | YES  |     | NULL    |       |
 +------------+--------------+------+-----+---------+-------+
+```
