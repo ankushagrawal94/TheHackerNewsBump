@@ -27,7 +27,7 @@ Thanks for reading! We welcome any feedback you may have!
 
 Order of Files Used:
 
-downloadAllData.rb 				-	download all of the data into json files
+`downloadAllData.rb 				-	download all of the data into json files
 JSONtoMySQL.py 					- 	transfer relevant JSON data to a MySQL database
 searchDBForCurrentStars.py 		- 	is reponsible for getting the most recent entry for each repository
 getHNData.py 					-	query the algolia API to get the hn data into DB (55 hours to run)
@@ -37,27 +37,121 @@ getExpectedDateOfMention.py 	- 	gets the hn_expected_date_of_mention
 getRelevantGHeventAvgCase.py 	-	get the most relevant GH events where relevance is defined as within 1 week of the hn_expected_date_of_mention
 analyzeData.py 					- 	Analyzes the data and saves results into DB
 analyzeDateAvgCase.py 			-	Analyzes the average cases data
-graph.py 						-	This file prepares the HTML for graphing
+graph.py 						-	This file prepares the HTML for graphing`
 
 
+##Tables Used
 
-CREATE TABLE chart_table_avg( day INT(6), slider_stars INT(6), slider_hn_points INT(6), daily_avg_stars INT(8), daily_growth DOUBLE PRECISION(10,5), change_in_growth DOUBLE PRECISION(10,5), num_data_points INT(6))
+chart_table_avg
 
++------------------+--------------+------+-----+---------+-------+
+| Field            | Type         | Null | Key | Default | Extra |
++------------------+--------------+------+-----+---------+-------+
+| day              | int(6)       | YES  |     | NULL    |       |
+| slider_stars     | int(6)       | YES  |     | NULL    |       |
+| slider_hn_points | int(6)       | YES  |     | NULL    |       |
+| daily_avg_stars  | int(8)       | YES  |     | NULL    |       |
+| daily_growth     | double(10,5) | YES  |     | NULL    |       |
+| change_in_growth | double(10,5) | YES  |     | NULL    |       |
+| num_data_points  | int(6)       | YES  |     | NULL    |       |
++------------------+--------------+------+-----+---------+-------+
 
-event_table
+chart_table
 
-repo_name	VARCHAR(255),
-stars 		INT(6),
-event_time  	DATE
++-------------------+--------------+------+-----+---------+-------+
+| Field             | Type         | Null | Key | Default | Extra |
++-------------------+--------------+------+-----+---------+-------+
+| day               | int(6)       | YES  |     | NULL    |       |
+| slider_stars      | int(6)       | YES  |     | NULL    |       |
+| slider_hn_points  | int(6)       | YES  |     | NULL    |       |
+| daily_total_stars | int(8)       | YES  |     | NULL    |       |
+| daily_growth      | double(10,5) | YES  |     | NULL    |       |
+| change_in_growth  | double(10,5) | YES  |     | NULL    |       |
++-------------------+--------------+------+-----+---------+-------+
 
-hn_event_table
+days_after
 
-repo_name	VARCHAR(255),
-stars 		INT(6),
-hn_points	INT(6)
-event_time  	DATE
++-----------------+--------+------+-----+---------+-------+
+| Field           | Type   | Null | Key | Default | Extra |
++-----------------+--------+------+-----+---------+-------+
+| stars           | int(6) | YES  |     | NULL    |       |
+| hn_points       | int(6) | YES  |     | NULL    |       |
+| avg_days_after  | int(6) | YES  |     | NULL    |       |
+| mode_days_after | int(6) | YES  |     | NULL    |       |
+| num_data_points | int(6) | YES  |     | NULL    |       |
++-----------------+--------+------+-----+---------+-------+
+
+event_table_two
+
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| repo_name    | varchar(255) | YES  |     | NULL    |       |
+| stars        | int(6)       | YES  |     | NULL    |       |
+| event_time   | date         | YES  |     | NULL    |       |
+| repo_created | date         | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+
+event_table_condensed 
+
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+
+event_table_general_condensed
+
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| repo_name    | varchar(255) | YES  |     | NULL    |       |
+| stars        | int(6)       | YES  |     | NULL    |       |
+| event_time   | date         | YES  |     | NULL    |       |
+| repo_created | date         | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+
+hn_event_max
+
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+
+hn_event_table_two
+
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+
+latest_repo_events
+
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
 
 max_stars
 
-repo_name	VARCHAR(255), 
-stars		INT(6)
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
