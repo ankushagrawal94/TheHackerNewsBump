@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>The HTML5 Slider Element / KnobKnob Example | Tutorialzine Demo</title>
+        
+        <!-- CSS stylesheets -->
+        <link rel="stylesheet" href="assets/css/styles.css" />
+        <link rel="stylesheet" href="assets/knobKnob/knobKnob.css" />
+        
+        <!--[if lt IE 9]>
+          <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+    </head>
+    
+    <body>
+
+		
+		<section id="main">
+			
+			<p class="examples">Examples: <a href="./">Default Slider Control</a> | <a href="./slider-jqueryui.html">jQuery UI Slider</a> | <a href="./slider-knob.html">KnobKnob Version</a> </p>
+			
+			<div id="container">
+				<div id="control"></div>
+			</div>
+			
+			<!-- The range input is hidden and updated on each rotation of the knob -->
+			<input type="range" id="slider" min="0" max="500" value="25" />
+			
+			<p class="note">Current value: <span id="currentValue">0</span></p>
+		</section>
+		
+        <footer>
+	        <h2><i>Tutorial:</i> The HTML5 Slider Element</h2>
+            <a class="tzine" href="http://tutorialzine.com/2011/12/what-you-need-to-know-html5-range-input/">Head on to <i>Tutorial<b>zine</b></i> to download this example</a>
+        </footer>
+        
+        <!-- Including jQuery -->
+		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		
+		<!-- Including KnobKnob and our main script file -->
+		<script src="assets/knobKnob/transform.js"></script>
+		<script src="assets/knobKnob/knobKnob.jquery.js"></script>
+		<script src="assets/js/slider-knob.js"></script>
+
+        <!-- BSA AdPacks code. Please ignore and remove.--> 
+        <script src="http://cdn.tutorialzine.com/misc/adPacks/v1.js" async></script>
+    
+    </body>
+</html>
+
