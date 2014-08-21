@@ -13,6 +13,42 @@ db = MySQLdb.connect(host="localhost", # your host, usually localhost
 
 cur = db.cursor() 
 
+cur.execute("DROP TABLE IF EXISTS chart_table_avg")
+cur.execute ("""
+	CREATE TABLE chart_table_avg
+	( 
+		day INT(6), 
+		slider_stars 		INT(6), 
+		slider_hn_points 	INT(6), 
+		daily_avg_stars 	INT(8), 
+		daily_growth 		DOUBLE PRECISION(10,5), 
+		change_in_growth 	DOUBLE PRECISION(10,5), 
+		num_data_points 	INT(6))
+""")
+db.commit()
+print "succesfully created the DB"
+
+
+
+cur.execute("SELECT * FROM days_after")
+days_after = cur.fetchall()
+#calculate avg_days_after
+days_used = 0
+avg_days_after = 0
+for day in days_after:
+	d_stars = day[0]
+	d_hn_points = day[1]
+	d_avg_days_after = day[2]
+	d_mode_days_after = day[3]
+	d_num_data_points = day[4]
+	if d_num_data_points < 10:
+		continue
+	avg_days_after += d_avg_days_after
+	days_used += 1
+
+avg_days_after /= days_used
+print "The average number of days after is: %s" % avg_days_after
+
 event_num = 0
 completed_events = 0
 big_event_count = 0
@@ -59,11 +95,10 @@ try:
 			hn_event_list_size = len(hn_event_list)
 			for event in hn_event_list:
 				
-
 				repo_name = event[0]
 				stars = event[1]
-				hn_points = event[2]
-				event_time = event[3]
+				event_time = event[2]
+				repo_created = event[3]
 
 				#skip duplicates
 				if event[0] == prev_row:
@@ -81,9 +116,11 @@ try:
 				
 				daily_event_times = [] 		#store event times for each day
 				daily_star_count = []		#store stars for each day
-				start_date = event_time + datetime.timedelta(days = -7)
-				end_date = event_time + datetime.timedelta(days = 7)
-				cur.execute(("SELECT * FROM event_table_condensed WHERE repo_name = \"%s\" AND event_time BETWEEN \"%s\" AND \"%s\" ") % (repo_name, start_date, end_date))
+				
+				expected_hn_mention_date = repo_created + datetime.timedelta(days = avg_days_after)
+				start_date = expected_hn_mention_date + datetime.timedelta(days = -7)
+
+				cur.execute(("SELECT * FROM event_table_general_condensed WHERE repo_name = \"%s\"") % (repo_name))
 				
 				flag = False		#tells whether you entered cur.fetchall for loop
 				for row in cur.fetchall():

@@ -15,7 +15,7 @@ Caption: This graph shows a series of things. First, it constrains the data to o
 
 That was a mighty caption so let us break down what it means and why we are using this data. First there are the two sliders you see up above. One controls the number of stars, and one controls the number of HN Points. These constrain the data represented in the graph to tiers. The reason for this is that there exists a big disparity in the effects on a repository with 50,000 stars as compared to one with less than 50 stars. The HN constraint is to help determine the number of HN Points you need your repository to get for it to get you the "bump". It is important to note that the GitHub repositories without mentions on hacker news (see blue) are not constrained by the HN_points slider.
 
-Now that we have covered the sliders, lets go over to the red data source. The blue line represents the percdenage increase in the number of stars each day. This is calculated by looking at the number of stars on each day for an individual repository, comparing it to the number of stars for the previous day, and calculating a percent increase. The data was calculated this way because we found the data to be too far skewed in the direction of large repositories when looking at raw increase in number of stars. If you want to see that chart, see below.
+Now that we have covered the sliders, lets go over to the red data source. The blue line represents the percentage increase in the number of stars each day. This is calculated by looking at the number of stars on each day for an individual repository, comparing it to the number of stars for the previous day, and calculating a percent increase. The data was calculated this way because we found the data to be too far skewed in the direction of large repositories when looking at raw increase in number of stars. If you want to see that chart, see below.
 
 The next data source we have is the all important baseline blue data. This contains has the information about all GitHub repositories within the constraints. It serves the purpose of showing us the daily rate of increase in stars we should expect a GitHub repository to have. This is useful in determining whether HN has any effect at all. The data included here is not the 14 day outlook for every span of days for every repository. It instead looks to our red data source to determine the number of days after a repository has been created for its HN feature [1]. We then use the 14 days surrounding the expected_hn_mention date to calculate our data. The reason we use this date is because to maintain the integrity of the estimate, the number of days after the repository's creation must be held constant.
 
@@ -57,9 +57,9 @@ chart_table_avg
 | change_in_growth | double(10,5) | YES  |     | NULL    |       |
 | num_data_points  | int(6)       | YES  |     | NULL    |       |
 +------------------+--------------+------+-----+---------+-------+
-
+```
 chart_table
-
+```
 +-------------------+--------------+------+-----+---------+-------+
 | Field             | Type         | Null | Key | Default | Extra |
 +-------------------+--------------+------+-----+---------+-------+
@@ -70,9 +70,9 @@ chart_table
 | daily_growth      | double(10,5) | YES  |     | NULL    |       |
 | change_in_growth  | double(10,5) | YES  |     | NULL    |       |
 +-------------------+--------------+------+-----+---------+-------+
-
+```
 days_after
-
+```
 +-----------------+--------+------+-----+---------+-------+
 | Field           | Type   | Null | Key | Default | Extra |
 +-----------------+--------+------+-----+---------+-------+
@@ -82,9 +82,9 @@ days_after
 | mode_days_after | int(6) | YES  |     | NULL    |       |
 | num_data_points | int(6) | YES  |     | NULL    |       |
 +-----------------+--------+------+-----+---------+-------+
-
+```
 event_table_two
-
+```
 +--------------+--------------+------+-----+---------+-------+
 | Field        | Type         | Null | Key | Default | Extra |
 +--------------+--------------+------+-----+---------+-------+
@@ -93,9 +93,9 @@ event_table_two
 | event_time   | date         | YES  |     | NULL    |       |
 | repo_created | date         | YES  |     | NULL    |       |
 +--------------+--------------+------+-----+---------+-------+
-
+```
 event_table_condensed 
-
+```
 +------------+--------------+------+-----+---------+-------+
 | Field      | Type         | Null | Key | Default | Extra |
 +------------+--------------+------+-----+---------+-------+
@@ -103,9 +103,9 @@ event_table_condensed
 | stars      | int(6)       | YES  |     | NULL    |       |
 | event_time | date         | YES  |     | NULL    |       |
 +------------+--------------+------+-----+---------+-------+
-
+```
 event_table_general_condensed
-
+```
 +--------------+--------------+------+-----+---------+-------+
 | Field        | Type         | Null | Key | Default | Extra |
 +--------------+--------------+------+-----+---------+-------+
@@ -114,9 +114,9 @@ event_table_general_condensed
 | event_time   | date         | YES  |     | NULL    |       |
 | repo_created | date         | YES  |     | NULL    |       |
 +--------------+--------------+------+-----+---------+-------+
-
+```
 hn_event_max
-
+```
 +------------+--------------+------+-----+---------+-------+
 | Field      | Type         | Null | Key | Default | Extra |
 +------------+--------------+------+-----+---------+-------+
@@ -125,9 +125,9 @@ hn_event_max
 | hn_points  | int(6)       | YES  |     | NULL    |       |
 | event_time | date         | YES  |     | NULL    |       |
 +------------+--------------+------+-----+---------+-------+
-
+```
 hn_event_table_two
-
+```
 +------------+--------------+------+-----+---------+-------+
 | Field      | Type         | Null | Key | Default | Extra |
 +------------+--------------+------+-----+---------+-------+
@@ -136,9 +136,9 @@ hn_event_table_two
 | hn_points  | int(6)       | YES  |     | NULL    |       |
 | event_time | date         | YES  |     | NULL    |       |
 +------------+--------------+------+-----+---------+-------+
-
+```
 latest_repo_events
-
+```
 +------------+--------------+------+-----+---------+-------+
 | Field      | Type         | Null | Key | Default | Extra |
 +------------+--------------+------+-----+---------+-------+
@@ -147,9 +147,9 @@ latest_repo_events
 | hn_points  | int(6)       | YES  |     | NULL    |       |
 | event_time | date         | YES  |     | NULL    |       |
 +------------+--------------+------+-----+---------+-------+
-
+```
 max_stars
-
+```
 +------------+--------------+------+-----+---------+-------+
 | Field      | Type         | Null | Key | Default | Extra |
 +------------+--------------+------+-----+---------+-------+

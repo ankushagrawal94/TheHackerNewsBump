@@ -64,7 +64,7 @@ for event in global_event_list:
 		repo_created = event[3]
 
 		#random sample
-		if event_count < 162697:
+		if event_count < 176602:
 			continue
 		if event_count % 50 == 0:
 			continue
