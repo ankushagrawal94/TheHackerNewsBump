@@ -110,7 +110,7 @@ try:
 
 				raw_num_stars = [0] * 15
 				repo_percent_change = []
-				print "Beginning analysis for: %s" % repo_name
+				#print "Beginning analysis for: %s" % repo_name
 				#print "total elapsed time is: %s seconds" % int(time.time() - start_time)
 				#Get all 15 days
 				
@@ -144,7 +144,7 @@ try:
 						pass
 					i += 1
 
-				print "total elapsed time is: %s seconds" % int(time.time() - start_time)
+				#print "total elapsed time is: %s seconds" % int(time.time() - start_time)
 				
 				#print "Fixing Erroneous Data from: "
 				#print raw_num_stars
@@ -189,7 +189,7 @@ try:
 				#print "Adjusted Data is: "
 				#print raw_num_stars
 				
-				print "processing list"
+				#print "processing list"
 
 				#Process the list
 				i = 1
