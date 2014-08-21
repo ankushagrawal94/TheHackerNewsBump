@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8" />        
+        <!-- CSS stylesheets -->
         <link rel="stylesheet" href="assets/css/styles.css" />
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
+        
+        <!--[if lt IE 9]>
+          <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
     </head>
     
     <body>
-        <br><br><br>
-    	<div align="center"><input id="defaultSlider" type="range" min="5" max="70000" /></div>
-		<p>Stars: <span id="currentValue" >0</span></p><br><br><br>
-
-        <div align="center"><input id="defaultSlider2" type="range" min="5" max="500" /></div>
-        <p>HN Pts: <span id="currentValue2">0</span></p><br><br><br>
-
+        <section id="main">         
+            <div id="slider"></div>
+            <p class="note">Stars: <span id="currentValue">0</span></p>
+            <div id="slider2"></div>
+            <p class="note">HackerNews Upvotes: <span id="currentValue2">0</span></p>
+        </section>
         <div align="center"><div id="chart_div" style="width: 900px; height: 500px;"></div></div>
-		
-
-        <!-- Including jQuery and jQuery UI from Google's CDN -->
-		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-		<script src="assets/js/slider-default.js"></script>
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+        <script src="assets/js/slider-jqueryui.js"></script>
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
         <script type="text/javascript">
             google.load("visualization", "1", {packages:["corechart"]});
@@ -96,11 +99,13 @@
                 chart.draw(joinedData, { legend: { position: 'none' }, colors: ['red', 'green'] });
             }                          
     
-    // Trigger the event on load, so
-    // the value field is populated:
+        // Trigger the event on load, so
+        // the value field is populated:
+        
+        //$('#defaultSlider').change();
+        
+        </script>
     
-    //$('#defaultSlider').change();
-    
-    </script>
     </body>
 </html>
+
