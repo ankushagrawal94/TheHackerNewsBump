@@ -40,6 +40,7 @@ Order of Files Used:
  - analyzeData.py 					- 	Analyzes the data and saves results into DB
  - analyzeDateAvgCase.py 			-	Analyzes the average cases data
  - graph.py 						-	This file prepares the HTML for graphing
+ - get_chart_table.py 				-	Prepares the data that will be pasted into google spreadsheet
 ```
 
 ##Tables Used
