@@ -22,7 +22,7 @@ Now that we have covered the sliders, lets go over to the red data source. The g
 
 The next data source we have is the all important baseline green data. This contains has the information about all GitHub repositories within the constraints. It serves the purpose of showing us the daily rate of increase in stars we should expect a GitHub repository to have. This is useful in determining whether HN has any effect at all. The data included here is not the 14 day outlook for every span of days for every repository. It instead looks to our red data source to determine the number of days after a repository has been created for its HN feature [1]. We then use the 14 days surrounding the expected_hn_mention date to calculate our data. The reason we use this date is because to maintain the integrity of the estimate, the number of days after the repository's creation must be held constant.
 
-This is essentially how we got our data! For more in depth information about the techniques used in calculation, methods, challenges, code, steps for recreation and insights check out this blog post! If you'd like to check out this post with the interactive graph, visit the [GitHub page here](https://ankushagrawal94.github.io/TheHackerNewsBump).
+This is essentially how we got our data! For more in depth information about the techniques used in calculation, methods, challenges, code, steps for recreation and insights check out [this blog post](https://ankushagrawal94.github.io/TheHackerNewsBump/readMore/index.html)! If you'd like to check out this post with the interactive graph, visit the [GitHub page here](https://ankushagrawal94.github.io/TheHackerNewsBump).
 
 The data was acquired from the GitHub Archive, the GitHub API, and the Algolia HN Api.
 
