@@ -1,0 +1,5 @@
+In README.md change "insert graph here" to the graph with a link to the short blog post
+
+In index.html, update the text to match README.md, and update the graph to reflect new changes
+
+
