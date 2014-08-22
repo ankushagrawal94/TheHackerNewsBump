@@ -20,7 +20,7 @@ for dataPoint in all_data:
 	count += 1
 	avg_percent += dataPoint[5]
 avg_percent /= count
-print avg_percent
+print "chart_table_avg percent growth: %s" % avg_percent
 
 cur.execute("select * from chart_table")
 
@@ -32,7 +32,8 @@ for dataPoint in all_data:
 	count += 1
 	data_percent += dataPoint[5]
 data_percent /= count
-print data_percent
+print "chart_table percent growth: %s" % data_percent
 
+print "Difference in percent growth: %s" % (data_percent - avg_percent)
 
 print "complete"
