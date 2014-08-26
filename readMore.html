@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
+    <!--link rel="stylesheet" href="assets/css/styles.css" />-->
+    
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>The HackerNews Bump by ankushagrawal94</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>The HackerNews Bump</h1>
+          <h2>Correlating Hacker News posts with GitHub Stars</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/ankushagrawal94/GitHubChallenge/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/ankushagrawal94/GitHubChallenge/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/ankushagrawal94/GitHubChallenge" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+<h2>Introduction</h2>
+<p>GitHub 3rd Annual Data Challenge is a data analytics project aimed to make sense of millions of data points gathered from all the repositories hosted on github.com. GitHub is a known to be the home of thousands of sophisticated and widely-known repositories. That leaves us wonder what factors have attributed to their successes.</p> 
+
+<h2>The Questions</h2>
+<p>Hacker News, a very popular social news website catered to programmers and entrepreneurs, often contains posts that are linked to GitHub repositories, most of which are very popular. <br><br>How does linking a GitHub repository on HackerNews change its popularity? Is there such thing as ‘the HackerNews popularity bump’ ?<br><br>Those are the questions we want to answer after this project. We want to determine if being mentioned on Hacker News significantly contributes to a repository’s popularity and if so, by how much. Popularity is defined as the raw number of ‘stars’ a particular repository has. To answer this ‘simple’ binary question, we studied the growth rate of each of the 1.5 millions repositories a week before and after the date it was mentioned on Hacker News, if it was mentioned at all. We repeated this process for all repositories to find the average. </p>
+
+<h2>tl;dr</h2>
+<section id="main">         
+            <div id="slider"></div>
+            <p class="note">Stars: <span id="currentValue">10</span></p>
+            <div id="slider2"></div>
+            <p class="note">HackerNews Upvotes: <span id="currentValue2">10</span></p>
+</section>
+<div align="center"><div id="chart_div" style="width: 600px; height: 500px;"></div></div>
+
+
+<p>HackerNews will increase the rate of growth in number of stars for the repo by 38.15% from -0.71% to 37.45%. The percentage  increase varies depending on your repository’s number of stars and your HackerNews post’s upvotes.<br><br>The graph contains data that only matches with the constraints on the sliders. The red line shows the daily percentage increase in the number of stars for the week before and after the HackerNews mention. The blue line shows the daily percentage increase in the number of stars for all repositories in the week surrounding the expected date of mention.</p>
+
+<h2>Understanding tl;dr</h2>
+<p>The sliders control the two searching constraints: number of  upvotes of a HackerNews post and number of stars of a linked GitHub repository. They represent different tiers of the data. This is because there is a large disparity in the effects on a 50,000-star repository as opposed to a 50-star one. The HackerNews upvotes slider determines the upvotes needed to create the “popularity bump”. Note that the repositories that have not been mentioned on HackerNews are not constrained by this slider. <br><br>The red line represents the percentage growth in stars each day. This is calculated by the generic growth formula. For instance, if a repository has 100 stars today and 120 stars tomorrow, the growth is (120 - 100)/100 = 20%. The data was processed and visualized this way instead of using the raw number of stars. This is because we found the data to be too far skewed when some repositories have a huge number of stars (cough cough Twitter’s Bootstrap). <br><br>The blue line represents the expected growth of a GitHub repository without being mentioned on HackerNews. This is extremely useful in determining whether HackerNews has any effect at all. The data included here is not the 15 day outlook, but rather an expected growth without any effect from HackerNews.</p>
+
+<h2>Obtaining Data</h2>
+<p>To gather information about the popularity of repositories over time, we attempted to recreate a timeline of all GitHub events useful for this study (i.e when a user starring a repository). Unfortunately, these data was not readily available to download; they had to be obtained from alternative data sources. There were 3 options available:
+<br>-GitHub’s native API: a typical API hosted by GitHub
+<br>Google BigQuery: a RESTful web service enabling interactive analysis of massive datasets
+<br>GitHub Archive: an open-source project by Google engineer Ilya Grigorik
+All of these data sources provided enough information needed for our study. However, we ran into a few hiccups along the way. <br><br>We first tried gathering data from GitHub’s native API by using a Python script and a REST library. Getting the correct queries and responses from the GitHub API requests was fairly simple. The only fallback we could see with this approach was the 10,000 API calls per hour, until we saw discrepancies in the data we got back: we did not see the entire events history for some extremely popular repositories. We later found out that this was due to ‘pagination limit’. This meant if the history of a repository spanned across 10 pages, we would only be able to see up to the 10th page. We did not know how to work around this problem, so we turned to the next data source option, Google BigQuery.<br><br>Google BigQuery really blew us away with its computing power. It could crunch through gigabytes of data in a matter of seconds. The only thing it needed was a SQL-like query. The data could be downloaded in JSON or CSV format once the queries completed. This source proved to be ideal until we found out that the computing power we needed would cost more than ‘Free’. Moving on.<br><br>The last data source option was GitHub Archive. After finding a Ruby script example, we tweaked the script to download all the data files to process later on. However, the files were in GZIP format, a compression form used to store large files on the web. We had to do more tweaking to do the Ruby script to unzip and read the GZIP files, since Python could not finish this particular task. All the events history data could finally be obtained.</p>
+
+<h2>Analyzing Data</h2>
+<p>Once all the data was collected and stored in 360 GB worth of JSON, we thought reading from each file to process do the calculation was just a few steps away. Little did we know reading through gigabytes of data would take as long as 5 hours per repository. Our research led to the use of mySQL database, which seemed to provide a more promising lookup time. A Python script read from all the JSON files, collected relevant information, and stored them into a local mySQL database. This one-time process took as long as 7 and a half hours on a MacBook Pro.
+<br><br>Storing relevant data to a mySQL database improved lookup speed significantly. We could query for data 
+much faster using SQL queries, as opposed to reading directly from raw JSON files every time. Although with very efficient speed per repository, there were well over 17 millions events on GitHub that we needed to account for. We agreed that repositories without a certain amount of stars were not worth studying. The challenge was to find the appropriate threshold, which would not take out too many ‘good’ repositories or too few ‘bad’ repositories. The threshold was then decided to be 5 stars. Using a complicated SQL query with a little help of a Stack Overflow user, a table with all the names of the repositories that needed to be checked for Hacker News mention was created.<br><br>The next step was simple: iterating over the newly created table and check which repositories were mentioned on Hacker News. To achieve this, we used Hacker News’ Algolia API, which powered their search engine. The API returned standard JSON responses: if the repository was mentioned on Hacker News, we would know about all the posts it appeared in; if not, then the response would be empty. There were a few duplicates for some repositories (i.e more than one Hacker News post mentioned such repositories). We decided to leave out the ‘unimportant’ posts by selecting only the post with the most upvotes. This was done by tweaking the query used for limiting data coming from GitHub.<br><br>At this point, we had enough data to start cross referencing and create our final dataset: a table of all repositories that were mentioned on Hacker News at least once, along with their popularity data for 7 days before and after their date of mention. We would use this table for data visualization, calculating averaged values to make a general conclusion, and providing general, quick statistics about the dataset as a whole.<br><br></p>
+
+<h2>Visualizing Data</h2>
+<p>We plan to visualize these data using a line chart supported by Google Charts API. The line chart will have 15 points on the x-axis, representing the 7 days before, the day of Hacker News mention date, and the 7 days after. The y-axis will measure the popularity unit, be they the raw number of stars or the daily growth rate. The data obtained will be then transferred to a Google Spreadsheet, from which an HTML displays data queried via JavaScript and Google Queries API. </p>
+
+<h2>Files Used (in order)</h2>
+<pre><code>downloadAllData.rb           -   download all of the data into JSON files
+JSONtoMySQL.py               -   transfer relevant JSON data to a MySQL  - database
+searchDBForCurrentStars.py   -   responsible for getting most recent entry for each repository
+getHNData.py                 -   query Algolia API to get the hn data into DB (takes 55 hours)
+hnTabletoHNTableMax.py       -   gets the most relevant HN event for each repo
+getRelevantGHevents.py       -   gets the most relevant GH events based on HN mentions
+getExpectedDateOfMention.py  -   gets the hn_expected_date_of_mention
+getRelevantGHeventAvgCase.py -   get GH events within 1 week of hn_expected_date_of_mention
+analyzeData.py               -   analyzes the data and saves results into DB
+analyzeDateAvgCase.py        -   analyzes the average cases data
+get_chart_table.py           -   prepares the data that will be pasted into google spreadsheet graph.py                     -   prepares the HTML for visualization
+</code></pre>
+
+<h2>Tables Used</h2>
+chart_table_avg
+<pre><code>
++------------------+--------------+------+-----+---------+-------+
+| Field            | Type         | Null | Key | Default | Extra |
++------------------+--------------+------+-----+---------+-------+
+| day              | int(6)       | YES  |     | NULL    |       |
+| slider_stars     | int(6)       | YES  |     | NULL    |       |
+| slider_hn_points | int(6)       | YES  |     | NULL    |       |
+| daily_avg_stars  | int(8)       | YES  |     | NULL    |       |
+| daily_growth     | double(10,5) | YES  |     | NULL    |       |
+| change_in_growth | double(10,5) | YES  |     | NULL    |       |
+| num_data_points  | int(6)       | YES  |     | NULL    |       |
++------------------+--------------+------+-----+---------+-------+
+</code></pre>
+chart_table
+<pre><code>
++-------------------+--------------+------+-----+---------+-------+
+| Field             | Type         | Null | Key | Default | Extra |
++-------------------+--------------+------+-----+---------+-------+
+| day               | int(6)       | YES  |     | NULL    |       |
+| slider_stars      | int(6)       | YES  |     | NULL    |       |
+| slider_hn_points  | int(6)       | YES  |     | NULL    |       |
+| daily_total_stars | int(8)       | YES  |     | NULL    |       |
+| daily_growth      | double(10,5) | YES  |     | NULL    |       |
+| change_in_growth  | double(10,5) | YES  |     | NULL    |       |
++-------------------+--------------+------+-----+---------+-------+
+</code></pre>
+days_after
+<pre><code>
++-----------------+--------+------+-----+---------+-------+
+| Field           | Type   | Null | Key | Default | Extra |
++-----------------+--------+------+-----+---------+-------+
+| stars           | int(6) | YES  |     | NULL    |       |
+| hn_points       | int(6) | YES  |     | NULL    |       |
+| avg_days_after  | int(6) | YES  |     | NULL    |       |
+| mode_days_after | int(6) | YES  |     | NULL    |       |
+| num_data_points | int(6) | YES  |     | NULL    |       |
++-----------------+--------+------+-----+---------+-------+
+</code></pre>
+event_table_two
+<pre><code>
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| repo_name    | varchar(255) | YES  |     | NULL    |       |
+| stars        | int(6)       | YES  |     | NULL    |       |
+| event_time   | date         | YES  |     | NULL    |       |
+| repo_created | date         | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+</code></pre>
+event_table_condensed<pre><code>
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+event_table_general_condensed<pre><code>
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| repo_name    | varchar(255) | YES  |     | NULL    |       |
+| stars        | int(6)       | YES  |     | NULL    |       |
+| event_time   | date         | YES  |     | NULL    |       |
+| repo_created | date         | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+</code></pre>
+hn_event_max<pre><code>
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+hn_event_table_two<pre><code>
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+latest_repo_events<pre><code>
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+max_stars<pre><code>
++------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+
+
+        </section>
+
+        <footer>
+          The HackerNews Bump is maintained by <a href="https://github.com/ankushagrawal94">ankushagrawal94</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+        <script src="assets/js/slider-jqueryui.js"></script>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+            google.load("visualization", "1", {packages:["corechart"]});
+            google.setOnLoadCallback(initialize);
+            var data;
+            var data2;
+            var dataNew;
+            var dataNew2;
+            var query;
+            var query2;
+            var stars_slider;
+            var hn_pts_slider;
+
+            function initialize() {
+                stars_slider = get_curr();
+                hn_pts_slider = get_curr2();
+                var opts = {sendMethod: 'auto'};
+                
+                query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/1F6nHIvGWK7elk5ZzMlQy97z5DdtI-v7kkk_0CArqyI4/edit?usp=sharing', opts);
+                q = 'select A, E where B = ' + stars_slider.toString() + ' AND C = ' + hn_pts_slider.toString() + ' AND G = 0';
+                query.setQuery(q);
+                query.send(handleQueryResponse1);
+
+                query2 = new google.visualization.Query('https://docs.google.com/spreadsheets/d/1F6nHIvGWK7elk5ZzMlQy97z5DdtI-v7kkk_0CArqyI4/edit?usp=sharing', opts);
+                q2 = 'select A, D where B = ' + stars_slider.toString() + ' AND C = ' + hn_pts_slider.toString() + ' AND G = 0';
+                query2.setQuery(q2);
+                query2.send(handleQueryResponse3);
+            }
+
+            function handleQueryResponse1(response) {
+                if (response.isError()) {
+                    alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+                    return;
+                }
+                data = response.getDataTable();
+                q = 'select H, L where I = ' + stars_slider.toString() + ' AND J = ' + hn_pts_slider.toString() + ' AND N = 1';
+                query.setQuery(q);
+                query.send(handleQueryResponse2);
+            }
+
+            function handleQueryResponse2(response) {
+                if (response.isError()) {
+                    alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+                    return;
+                }
+                data2 = response.getDataTable();
+                var option = {
+                    vAxis: {title: 'Percent Growth'},
+                    hAxis: {
+                        title: 'Days', 
+                        gridlines: {
+                            color: 'red',
+                            count: 3
+                        }
+                    }
+                };
+                var joinedData = google.visualization.data.join(data, data2, 'full', [[0, 0]], [1], [1]);
+                var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+                chart.draw(joinedData, option);
+            }        
+
+            function handleQueryResponse3(response) {
+                if (response.isError()) {
+                    alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+                    return;
+                }
+                dataNew = response.getDataTable();
+                q2 = 'select H, K where I = ' + stars_slider.toString() + ' AND J = ' + hn_pts_slider.toString() + ' AND N = 1';
+                query2.setQuery(q2);
+                query2.send(handleQueryResponse4);
+            }
+
+            function handleQueryResponse4(response) {
+                if (response.isError()) {
+                    alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+                    return;
+                }
+                dataNew2 = response.getDataTable();
+                var option = {
+                    vAxis: {title: 'Stars'},
+                    hAxis: {
+                        title: 'Days', 
+                        gridlines: {
+                            color: 'red',
+                            count: 3
+                        }
+                    }
+                };
+                var joinedData = google.visualization.data.join(dataNew, dataNew2, 'full', [[0, 0]], [1], [1]);
+                var chart = new google.visualization.LineChart(document.getElementById('chart_div2'));
+                chart.draw(joinedData, option);
+            }                     
+        
+        </script>
+  </body>
+</html>
