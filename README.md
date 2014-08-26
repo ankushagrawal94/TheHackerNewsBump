@@ -11,7 +11,7 @@ The short answer to this question is that it will increase the rate of growth in
 To see the behaviour of daily percentage growth each day, try working with the graph below. This graph is the result of 17 million events from April 2012- August 2014.
 
 
-Insert main graph here
+![charts.png](/images/charts.png)
 
 
 Caption: This graph shows a series of things. First, it constrains the data to only match what is selected by the sliders. In red it shows the daily % increase in the number of stars for the week before and after a HN mention. In green it shows the daily % increase in the number of stars for all repositories in the week surrounding the date we expect a mention to happen.
