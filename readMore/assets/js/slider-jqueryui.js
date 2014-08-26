@@ -28,7 +28,7 @@ $(function() {
             if (ui.value == ui.values[0]) {
               slider.slider('values', 0, value);
             }
-            $("#currentValue").html(getRealValue(slider.slider('values', 10)));
+            $("#currentValue").html(getRealValue(slider.slider('values', 0)));
             return false;
         },
         change: function(event, ui) { 

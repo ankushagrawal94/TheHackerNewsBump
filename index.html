@@ -37,16 +37,17 @@
           <p>With this data analysis we aim to answer the question: <em>"How does posting a link to a repository on HackerNews change the number of stars a repository has?"</em>
 Or more generally, <em>"Is there such thing as the HN Bump?"</em></p>
 
-<p>The short answer to this question is that it will _____ the rate of growth in number of stars for the repo by ____%. The percentage increase varies depending on the number of stars your repository has and the number of upvotes your HackerNews post has.</p>
+<p>The short answer to this question is that it will increase the rate of growth in number of stars for the repo by 38.15% from -0.71% to 37.45%. The percentage increase varies depending on the number of stars your repository has and the number of upvotes your HackerNews post has.</p>
+
+<p>To see the behaviour of daily percentage growth each day, try working with the graph below. This graph is the result of 17 million events from April 2012- August 2014.</p>
 
 <section id="main">         
             <div id="slider"></div>
-            <p class="note">Stars: <span id="currentValue">0</span></p>
+            <p class="note">Stars: <span id="currentValue">10</span></p>
             <div id="slider2"></div>
-            <p class="note">HackerNews Upvotes: <span id="currentValue2">0</span></p>
+            <p class="note">HackerNews Upvotes: <span id="currentValue2">10</span></p>
         </section>
 <div align="center"><div id="chart_div" style="width: 600px; height: 500px;"></div></div>
-<div align="center"><div id="chart_div2" style="width: 600px; height: 500px;"></div></div>
 
 <p>Caption: This graph shows a series of things. First, it constrains the data to only match what is selected by the sliders. In red it shows the daily % increase in the number of stars for the week before and after a HN mention. In blue it shows the daily % increase in the number of stars for all repositories in the week surrounding the date we expect a mention to happen.</p>
 
@@ -56,11 +57,13 @@ Or more generally, <em>"Is there such thing as the HN Bump?"</em></p>
 
 <p>The next data source we have is the all important baseline blue data. This contains has the information about all GitHub repositories within the constraints. It serves the purpose of showing us the daily rate of increase in stars we should expect a GitHub repository to have. This is useful in determining whether HN has any effect at all. The data included here is not the 14 day outlook for every span of days for every repository. It instead looks to our red data source to determine the number of days after a repository has been created for its HN feature [1]. We then use the 14 days surrounding the expected_hn_mention date to calculate our data. The reason we use this date is because to maintain the integrity of the estimate, the number of days after the repository's creation must be held constant.</p>
 
-<p>This is essentially how we got our data! For more in depth information about the techniques used in calculation, methods, challenges, code, steps for recreation and insights check out this blog post!</p>
+<p>This is essentially how we got our data! For more in depth information about the techniques used in calculation, methods, challenges, code, steps for recreation and insights check out this blog post! If you'd like to check out this post with the interactive graph, visit the GitHub page here.
 
 <p>The data was acquired from the GitHub Archive, the GitHub API, and the Algolia HN Api.</p>
 
-<p>Thanks for reading! We welcome any feedback you may have!</p>
+<p>Thanks for reading!</p>
+
+<p>We welcome any feedback you may have!</p>
 
 <hr><p>Order of Files Used:</p>
 
@@ -78,132 +81,6 @@ Or more generally, <em>"Is there such thing as the HN Bump?"</em></p>
  - get_chart_table.py               -   Prepares the data that will be pasted into google spreadsheet
 </code></pre>
 
-<h2>
-<a name="tables-used" class="anchor" href="#tables-used"><span class="octicon octicon-link"></span></a>Tables Used</h2>
-
-<p>chart_table_avg</p>
-
-<pre><code>+------------------+--------------+------+-----+---------+-------+
-| Field            | Type         | Null | Key | Default | Extra |
-+------------------+--------------+------+-----+---------+-------+
-| day              | int(6)       | YES  |     | NULL    |       |
-| slider_stars     | int(6)       | YES  |     | NULL    |       |
-| slider_hn_points | int(6)       | YES  |     | NULL    |       |
-| daily_avg_stars  | int(8)       | YES  |     | NULL    |       |
-| daily_growth     | double(10,5) | YES  |     | NULL    |       |
-| change_in_growth | double(10,5) | YES  |     | NULL    |       |
-| num_data_points  | int(6)       | YES  |     | NULL    |       |
-+------------------+--------------+------+-----+---------+-------+
-</code></pre>
-
-<p>chart_table</p>
-
-<pre><code>+-------------------+--------------+------+-----+---------+-------+
-| Field             | Type         | Null | Key | Default | Extra |
-+-------------------+--------------+------+-----+---------+-------+
-| day               | int(6)       | YES  |     | NULL    |       |
-| slider_stars      | int(6)       | YES  |     | NULL    |       |
-| slider_hn_points  | int(6)       | YES  |     | NULL    |       |
-| daily_total_stars | int(8)       | YES  |     | NULL    |       |
-| daily_growth      | double(10,5) | YES  |     | NULL    |       |
-| change_in_growth  | double(10,5) | YES  |     | NULL    |       |
-+-------------------+--------------+------+-----+---------+-------+
-</code></pre>
-
-<p>days_after</p>
-
-<pre><code>+-----------------+--------+------+-----+---------+-------+
-| Field           | Type   | Null | Key | Default | Extra |
-+-----------------+--------+------+-----+---------+-------+
-| stars           | int(6) | YES  |     | NULL    |       |
-| hn_points       | int(6) | YES  |     | NULL    |       |
-| avg_days_after  | int(6) | YES  |     | NULL    |       |
-| mode_days_after | int(6) | YES  |     | NULL    |       |
-| num_data_points | int(6) | YES  |     | NULL    |       |
-+-----------------+--------+------+-----+---------+-------+
-</code></pre>
-
-<p>event_table_two</p>
-
-<pre><code>+--------------+--------------+------+-----+---------+-------+
-| Field        | Type         | Null | Key | Default | Extra |
-+--------------+--------------+------+-----+---------+-------+
-| repo_name    | varchar(255) | YES  |     | NULL    |       |
-| stars        | int(6)       | YES  |     | NULL    |       |
-| event_time   | date         | YES  |     | NULL    |       |
-| repo_created | date         | YES  |     | NULL    |       |
-+--------------+--------------+------+-----+---------+-------+
-</code></pre>
-
-<p>event_table_condensed </p>
-
-<pre><code>+------------+--------------+------+-----+---------+-------+
-| Field      | Type         | Null | Key | Default | Extra |
-+------------+--------------+------+-----+---------+-------+
-| repo_name  | varchar(255) | YES  |     | NULL    |       |
-| stars      | int(6)       | YES  |     | NULL    |       |
-| event_time | date         | YES  |     | NULL    |       |
-+------------+--------------+------+-----+---------+-------+
-</code></pre>
-
-<p>event_table_general_condensed</p>
-
-<pre><code>+--------------+--------------+------+-----+---------+-------+
-| Field        | Type         | Null | Key | Default | Extra |
-+--------------+--------------+------+-----+---------+-------+
-| repo_name    | varchar(255) | YES  |     | NULL    |       |
-| stars        | int(6)       | YES  |     | NULL    |       |
-| event_time   | date         | YES  |     | NULL    |       |
-| repo_created | date         | YES  |     | NULL    |       |
-+--------------+--------------+------+-----+---------+-------+
-</code></pre>
-
-<p>hn_event_max</p>
-
-<pre><code>+------------+--------------+------+-----+---------+-------+
-| Field      | Type         | Null | Key | Default | Extra |
-+------------+--------------+------+-----+---------+-------+
-| repo_name  | varchar(255) | YES  |     | NULL    |       |
-| stars      | int(6)       | YES  |     | NULL    |       |
-| hn_points  | int(6)       | YES  |     | NULL    |       |
-| event_time | date         | YES  |     | NULL    |       |
-+------------+--------------+------+-----+---------+-------+
-</code></pre>
-
-<p>hn_event_table_two</p>
-
-<pre><code>+------------+--------------+------+-----+---------+-------+
-| Field      | Type         | Null | Key | Default | Extra |
-+------------+--------------+------+-----+---------+-------+
-| repo_name  | varchar(255) | YES  |     | NULL    |       |
-| stars      | int(6)       | YES  |     | NULL    |       |
-| hn_points  | int(6)       | YES  |     | NULL    |       |
-| event_time | date         | YES  |     | NULL    |       |
-+------------+--------------+------+-----+---------+-------+
-</code></pre>
-
-<p>latest_repo_events</p>
-
-<pre><code>+------------+--------------+------+-----+---------+-------+
-| Field      | Type         | Null | Key | Default | Extra |
-+------------+--------------+------+-----+---------+-------+
-| repo_name  | varchar(255) | YES  |     | NULL    |       |
-| stars      | int(6)       | YES  |     | NULL    |       |
-| hn_points  | int(6)       | YES  |     | NULL    |       |
-| event_time | date         | YES  |     | NULL    |       |
-+------------+--------------+------+-----+---------+-------+
-</code></pre>
-
-<p>max_stars</p>
-
-<pre><code>+------------+--------------+------+-----+---------+-------+
-| Field      | Type         | Null | Key | Default | Extra |
-+------------+--------------+------+-----+---------+-------+
-| repo_name  | varchar(255) | YES  |     | NULL    |       |
-| stars      | int(6)       | YES  |     | NULL    |       |
-| event_time | date         | YES  |     | NULL    |       |
-+------------+--------------+------+-----+---------+-------+
-</code></pre>
         </section>
 
         <footer>
@@ -264,6 +141,7 @@ Or more generally, <em>"Is there such thing as the HN Bump?"</em></p>
                 }
                 data2 = response.getDataTable();
                 var option = {
+                    title: '*Red Line at 7 indicates date of mention on HackerNews',
                     vAxis: {title: 'Percent Growth'},
                     hAxis: {
                         title: 'Days', 
@@ -296,6 +174,7 @@ Or more generally, <em>"Is there such thing as the HN Bump?"</em></p>
                 }
                 dataNew2 = response.getDataTable();
                 var option = {
+                    title: '*Red Line at 7 indicates date of mention on HackerNews',
                     vAxis: {title: 'Stars'},
                     hAxis: {
                         title: 'Days', 

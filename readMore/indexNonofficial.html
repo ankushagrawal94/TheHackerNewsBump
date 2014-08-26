@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" />
+    <!--link rel="stylesheet" href="assets/css/styles.css" />-->
+    
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>The HackerNews Bump by ankushagrawal94</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>The HackerNews Bump</h1>
+          <h2>Correlating Hacker News posts with GitHub Stars</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/ankushagrawal94/GitHubChallenge/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/ankushagrawal94/GitHubChallenge/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/ankushagrawal94/GitHubChallenge" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <p>With this data analysis we aim to answer the question: <em>"How does posting a link to a repository on HackerNews change the number of stars a repository has?"</em>
+Or more generally, <em>"Is there such thing as the HN Bump?"</em></p>
+
+<p>The short answer to this question is that it will _____ the rate of growth in number of stars for the repo by ____%. The percentage increase varies depending on the number of stars your repository has and the number of upvotes your HackerNews post has.</p>
+
+<section id="main">         
+            <div id="slider"></div>
+            <p class="note">Stars: <span id="currentValue">0</span></p>
+            <div id="slider2"></div>
+            <p class="note">HackerNews Upvotes: <span id="currentValue2">0</span></p>
+        </section>
+<div align="center"><div id="chart_div" style="width: 600px; height: 500px;"></div></div>
+<p>Caption: This graph shows a series of things. First, it constrains the data to only match what is selected by the sliders. In red it shows the daily % increase in the number of stars for the week before and after a HN mention. In blue it shows the daily % increase in the number of stars for all repositories in the week surrounding the date we expect a mention to happen.</p>
+
+<p>That was a mighty caption so let us break down what it means and why we are using this data. First there are the two sliders you see up above. One controls the number of stars, and one controls the number of HN Points. These constrain the data represented in the graph to tiers. The reason for this is that there exists a big disparity in the effects on a repository with 50,000 stars as compared to one with less than 50 stars. The HN constraint is to help determine the number of HN Points you need your repository to get for it to get you the "bump". It is important to note that the GitHub repositories without mentions on hacker news (see blue) are not constrained by the HN_points slider.</p>
+
+<p>Now that we have covered the sliders, lets go over to the red data source. The blue line represents the percentage increase in the number of stars each day. This is calculated by looking at the number of stars on each day for an individual repository, comparing it to the number of stars for the previous day, and calculating a percent increase. The data was calculated this way because we found the data to be too far skewed in the direction of large repositories when looking at raw increase in number of stars. If you want to see that chart, see below.</p>
+
+<p>The next data source we have is the all important baseline blue data. This contains has the information about all GitHub repositories within the constraints. It serves the purpose of showing us the daily rate of increase in stars we should expect a GitHub repository to have. This is useful in determining whether HN has any effect at all. The data included here is not the 14 day outlook for every span of days for every repository. It instead looks to our red data source to determine the number of days after a repository has been created for its HN feature [1]. We then use the 14 days surrounding the expected_hn_mention date to calculate our data. The reason we use this date is because to maintain the integrity of the estimate, the number of days after the repository's creation must be held constant.</p>
+
+<p>This is essentially how we got our data! For more in depth information about the techniques used in calculation, methods, challenges, code, steps for recreation and insights check out this blog post!</p>
+
+<p>The data was acquired from the GitHub Archive, the GitHub API, and the Algolia HN Api.</p>
+
+<p>Thanks for reading! We welcome any feedback you may have!</p>
+
+<hr><p>Order of Files Used:</p>
+
+<pre><code> - downloadAllData.rb               -   download all of the data into JSON files
+ - JSONtoMySQL.py                   -   transfer relevant JSON data to a MySQL  - database
+ - searchDBForCurrentStars.py       -   is responsible for getting the most recent entry for each repository
+ - getHNData.py                     -   query the algolia API to get the hn data into DB (55 hours to run)
+ - hnTabletoHNTableMax.py           -   gets the most relevant HN event for each repo
+ - getRelevantGHevents.py           -   gets the most relevant GH events based on HN mentions
+ - getExpectedDateOfMention.py      -   gets the hn_expected_date_of_mention
+ - getRelevantGHeventAvgCase.py     -   get the GH events within 1 week of the hn_expected_date_of_mention
+ - analyzeData.py                   -   Analyzes the data and saves results into DB
+ - analyzeDateAvgCase.py            -   Analyzes the average cases data
+ - graph.py                         -   This file prepares the HTML for graphing
+ - get_chart_table.py               -   Prepares the data that will be pasted into google spreadsheet
+</code></pre>
+
+<h2>
+<a name="tables-used" class="anchor" href="#tables-used"><span class="octicon octicon-link"></span></a>Tables Used</h2>
+
+<p>chart_table_avg</p>
+
+<pre><code>+------------------+--------------+------+-----+---------+-------+
+| Field            | Type         | Null | Key | Default | Extra |
++------------------+--------------+------+-----+---------+-------+
+| day              | int(6)       | YES  |     | NULL    |       |
+| slider_stars     | int(6)       | YES  |     | NULL    |       |
+| slider_hn_points | int(6)       | YES  |     | NULL    |       |
+| daily_avg_stars  | int(8)       | YES  |     | NULL    |       |
+| daily_growth     | double(10,5) | YES  |     | NULL    |       |
+| change_in_growth | double(10,5) | YES  |     | NULL    |       |
+| num_data_points  | int(6)       | YES  |     | NULL    |       |
++------------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+<p>chart_table</p>
+
+<pre><code>+-------------------+--------------+------+-----+---------+-------+
+| Field             | Type         | Null | Key | Default | Extra |
++-------------------+--------------+------+-----+---------+-------+
+| day               | int(6)       | YES  |     | NULL    |       |
+| slider_stars      | int(6)       | YES  |     | NULL    |       |
+| slider_hn_points  | int(6)       | YES  |     | NULL    |       |
+| daily_total_stars | int(8)       | YES  |     | NULL    |       |
+| daily_growth      | double(10,5) | YES  |     | NULL    |       |
+| change_in_growth  | double(10,5) | YES  |     | NULL    |       |
++-------------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+<p>days_after</p>
+
+<pre><code>+-----------------+--------+------+-----+---------+-------+
+| Field           | Type   | Null | Key | Default | Extra |
++-----------------+--------+------+-----+---------+-------+
+| stars           | int(6) | YES  |     | NULL    |       |
+| hn_points       | int(6) | YES  |     | NULL    |       |
+| avg_days_after  | int(6) | YES  |     | NULL    |       |
+| mode_days_after | int(6) | YES  |     | NULL    |       |
+| num_data_points | int(6) | YES  |     | NULL    |       |
++-----------------+--------+------+-----+---------+-------+
+</code></pre>
+
+<p>event_table_two</p>
+
+<pre><code>+--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| repo_name    | varchar(255) | YES  |     | NULL    |       |
+| stars        | int(6)       | YES  |     | NULL    |       |
+| event_time   | date         | YES  |     | NULL    |       |
+| repo_created | date         | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+<p>event_table_condensed </p>
+
+<pre><code>+------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+<p>event_table_general_condensed</p>
+
+<pre><code>+--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| repo_name    | varchar(255) | YES  |     | NULL    |       |
+| stars        | int(6)       | YES  |     | NULL    |       |
+| event_time   | date         | YES  |     | NULL    |       |
+| repo_created | date         | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+<p>hn_event_max</p>
+
+<pre><code>+------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+<p>hn_event_table_two</p>
+
+<pre><code>+------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+<p>latest_repo_events</p>
+
+<pre><code>+------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| hn_points  | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+
+<p>max_stars</p>
+
+<pre><code>+------------+--------------+------+-----+---------+-------+
+| Field      | Type         | Null | Key | Default | Extra |
++------------+--------------+------+-----+---------+-------+
+| repo_name  | varchar(255) | YES  |     | NULL    |       |
+| stars      | int(6)       | YES  |     | NULL    |       |
+| event_time | date         | YES  |     | NULL    |       |
++------------+--------------+------+-----+---------+-------+
+</code></pre>
+        </section>
+
+        <footer>
+          The HackerNews Bump is maintained by <a href="https://github.com/ankushagrawal94">ankushagrawal94</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+        <script src="assets/js/slider-jqueryui.js"></script>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+            google.load("visualization", "1", {packages:["corechart"]});
+            google.setOnLoadCallback(drawVisualization);
+            var currentData = 0;
+            var rowIndex;
+            var colIndex;
+            var realArray = [0. 0. 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+            var stars_slider;
+            var hn_pts_slider;
+
+            function drawVisualization() {
+                stars_slider = get_curr();
+                hn_pts_slider = get_curr2();
+                alert("hifd");
+                q = 'select A, E where B = 5 AND C = 500 AND G = 0';
+                getMe(q);
+            }
+
+            function getMe(q) {
+                //q = 'select I, J, N where K = ' + stars_slider.toString() + ' AND L = ' + hn_pts_slider.toString() + ' AND P = 1';
+                alert("hi");
+                var opts = {sendMethod: 'auto'};
+                var query = new google.visualization.Query('https://docs.google.com/spreadsheets/d/1F6nHIvGWK7elk5ZzMlQy97z5DdtI-v7kkk_0CArqyI4/edit?usp=sharing', opts);
+                query.setQuery(q);
+                query.send(handleQueryResponse);
+            }
+
+            function handleQueryResponse(response) {
+                 alert("call");
+                 if (response.isError()) {
+                    alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+                    return;
+                }
+                var data = response.getDataTable();
+
+                currentData = data.getFormattedValue(rowIndex, colIndex);
+                drawMe(currentData);
+                alert("done");
+            }
+
+            function drawMe(cur) {
+                alert('draw');
+                alert(cur);
+                // Create and populate the data table.
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'x');
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addColumn({type: 'string', role: 'annotationText'});
+                data.addColumn('number', 'Real Growth');
+                data.addColumn('number', 'Expected Growth');
+                data.addRow(["-7", null, null, Number(cur), 100]);
+                data.addRow(["-6", null, null, Number(cur), 121]);
+                data.addRow(["-5", null, null, Number(cur), 143]);
+                data.addRow(["-4", null, null, Number(cur), 145]);
+                data.addRow(["-3", null, null, Number(cur), 178]);
+                data.addRow(["-2", null, null, Number(cur), 190]);
+                data.addRow(["-1", 'HN', 'Hacker News Bump', Number(cur), 421]);
+                data.addRow(["0", null, null, Number(cur), 555]);
+                data.addRow(["1", null, null, Number(cur), 693]);
+                data.addRow(["2", null, null, Number(cur), 703]);
+                data.addRow(["3", null, null, Number(cur), 995]);
+                                  
+
+                // Create and draw the visualization.
+                new google.visualization.LineChart(document.getElementById('chart_div')).
+                draw(data, {
+                  vAxis: {maxValue: 1000},
+                  annotations: {style: 'line'}
+                });
+
+            }
+
+                        
+        </script>
+  </body>
+</html>
