@@ -2,4 +2,8 @@ In README.md change "insert graph here" to the graph with a link to the short bl
 
 In index.html, update the text to match README.md, and update the graph to reflect new changes
 
+Insert all zero data where there is not enough data
 
+Starting point should have initial values of 10
+
+Vertical line at 7 should have a caption
